@@ -1,0 +1,421 @@
+/*--------базовые переменные--------*/
+:root{
+  --BackColor: #0c2340;
+  --ActivationColor: #e87722;
+
+  --SecondLGrayColor: #d0d0ce;
+  --SecondMGrayColor: #b1b3b3;
+  --SecondDGrayColor: #97999B;
+
+  --transition-duration: 0.2s;
+}
+
+/*--------базовые стили основных элементов--------*/
+button{
+  background-color:var(--BackColor);
+  color:#ffffff;
+  cursor: pointer;
+}
+
+button.notAllowed{
+  background-color: var(--SecondLGrayColor);
+  color: var(--SecondDGrayColor);
+  pointer-events: none;
+}
+
+button:hover{
+  background-color:var(--ActivationColor);
+  transition-duration: var(--transition-duration) ;
+}
+
+.input.notAllowed{
+  background-color: var(--SecondLGrayColor);
+  color: var(--SecondDGrayColor);
+  pointer-events: none;
+}
+
+.select.notAllowed{
+  background-color: var(--SecondLGrayColor);
+  color: var(--SecondDGrayColor);
+  pointer-events: none;
+}
+
+h1{
+  color: var(--BackColor);
+}
+
+h4{
+  margin: 0;
+}
+
+.overlay{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0); /* Прозрачный цвет */
+  z-index: 999; /* Выше элемента ввода */
+  pointer-events: none; /* Прозрачный для событий мыши */
+}
+
+/*--------иконка загрузки--------*/
+.loader {
+  border: 16px solid var(--SecondLGrayColor);
+  border-top: 16px solid var(--ActivationColor);
+  border-bottom: 16px solid var(--ActivationColor);
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+
+  position: fixed;
+  left: 50%;
+  top: 50%;
+
+  z-index: 2;
+  display: none;
+}
+
+.loader.visible {
+  display: block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/*--------контекстное меню мыши--------*/
+.mouseContextMenu{
+  display: none;
+  position: absolute;
+
+  background-color: white;
+  color:var(--BackColor);
+  border: 1px solid var(--BackColor);
+
+  font-family: 'Gotham-Black', Arial Black, sans-serif;
+  font-size: 14px;
+}
+
+.mouseContextMenu ul{
+  margin: 0;
+  padding: 2px 2px;
+}
+
+.mouseContextMenu li {
+  list-style: none;
+  margin: 5px 0px;
+  cursor: pointer;
+  /*background-color: #d0d0ce;*/
+}
+
+.mouseContextMenu li:hover {
+  background-color:var(--ActivationColor);
+  transition-duration: var(--transition-duration) ;
+}
+/*--------подсказки--------*/
+.tooltip{
+  position: absolute;
+
+  background-color: white;
+  color:var(--BackColor);
+  border: 1px solid var(--BackColor);
+
+  font-family: 'Gotham-Black', Arial Black, sans-serif;
+  font-size: 12px;
+
+  z-index: 999;
+}
+
+/*--------табы--------*/
+.tab{
+  margin: 0;
+  padding-right: 1em;
+  padding-left: 1em;
+  background-color: var(--BackColor);
+  color:white;
+  border: solid 1px var(--BackColor);
+  cursor: pointer;
+}
+
+.tab:hover{
+  background-color:var(--ActivationColor);
+  transition-duration: var(--transition-duration) ;
+}
+
+.tab.active{
+  background-color: white;
+  color:var(--BackColor);
+  transition-duration: var(--transition-duration) ;
+}
+
+/*--------стили областей tabs--------*/
+.tab_item{
+  display: none;
+  margin: 0;
+  border: solid 1px var(--BackColor);
+}
+
+.tab_item.active{
+  display: block;
+}
+
+.tab_item_area{
+  border: solid 1px var(--BackColor);
+  margin: 5px;
+  margin-top: .7em;
+  padding-top: 1em;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  position: relative;
+}
+
+.tab_item_area_topic{
+  position: absolute;
+  margin: 0;
+  margin-left: .5em;
+  margin-right: 1em;
+  top: -12px;
+  background-color: white;
+}
+
+.tab_item_area_sub{
+  margin: 0;
+  display: flex;
+ /* justify-content: space-evenly;*/
+}
+
+.tab_item_area_sub_column{
+  margin-right: 2em;
+}
+
+
+/*-------Чек боксы------*/
+.CheckBox_area{
+  display: flex;
+  flex-direction: column;
+  min-height: 5em;
+  min-width: 5em;
+  height: fit-content;
+  margin: 5px;
+  border: solid 1px var(--BackColor);
+}
+
+.checkbox_line{
+  min-width: 12em;
+}
+
+/*--------pop_up--------*/
+.pop_up{
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: transparent;
+  z-index: 1;
+  transform: translateY(0%) scale(0);
+  transition: .4s ease-in-out;
+}
+
+.pop_up.active{
+  transform:  translateY(0%) scale(100%);
+  background-color: rgba(0,0,0,.8);
+}
+
+.pop_up_container{
+  display: flex;
+  width: 100%;
+  height: 100%;
+  top: 20%;
+}
+
+.pop_up_container{
+  margin: auto;
+  width: fit-content;
+  height: auto;
+  background-color: white;
+  position: relative;
+}
+
+.pop_up_body{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.pop_up_header{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+  border: solid 1px var(--BackColor);
+  background-color: var(--SecondMGrayColor);
+}
+
+
+.pop_up_body_tabs{
+  display: flex;
+  margin: 0;
+}
+/*--------trainingMessage--------*/
+.trainingMessage{
+  display: block;
+  position: absolute;
+
+  background-color: rgba(255, 255, 255, 0.0);
+
+  z-index: 1;
+
+  transform: translateY(0%) scale(0);
+  transition: .4s ease-in-out;
+}
+
+.trainingMessage.active{
+  transform:  translateY(0%) scale(100%);
+}
+
+.trainingMessageArrow{
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 0 17px 29.4px 17px;
+  border-color: transparent transparent gold transparent;
+  transform: rotate(0deg);
+}
+
+.trainingMessageWindow{
+  background-color: gold;
+}
+
+.trainingMessageHeader{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.trainingMessageContent{
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+/*--------Аккородеоны-----------*/
+.accordion_item{
+  border: solid 1px var(--BackColor);
+  position: relative;
+}
+
+.accordion_ctrlElement{
+
+    width: 0;
+    height: 0;
+    appearance: none;
+    display: none;
+}
+
+
+.accordion_label{
+  display: block;
+  padding: 5px;
+  padding-left: 20px;
+
+  color:white;
+  background-color: var(--BackColor);
+
+  cursor: pointer;
+}
+
+.accordion_label:hover{
+  background-color:var(--ActivationColor);
+  transition: background (--transition-duration) ease-out;
+}
+
+.accordion_content{
+  display: none;
+}
+
+.accordion_ctrlElement:checked ~ .accordion_content{
+  display: block;
+}
+
+.accordion_expandIcon{
+  display: block;
+
+  border-style: solid;
+  border-width: 5px 0 5px 8.7px;
+  border-color: transparent transparent transparent white;
+  transform: rotate(0deg);
+
+  
+  position: absolute;
+  top:50%;
+  left: 5px;
+
+  transform: translateY(-50%);
+
+  cursor:copy;
+}
+
+.accordion_ctrlElement:checked ~ .accordion_expandIcon{
+  border-style: solid;
+  border-width: 5px 0 5px 8.7px;
+  border-color: transparent transparent transparent white;
+  transform: rotate(90deg);
+
+  top:.5em;
+
+}
+
+/*--------Элементы основного экрана-----------*/
+.FullScreenBody{
+  position: fixed;
+  box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+}
+
+.header{ /*доступ по ID*/
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 20px;
+  min-height: 50px;
+  background-color: var(--SecondLGrayColor);
+}
+
+.header-logo-image{
+  height: 50px;
+  cursor: pointer;
+}
+/*
+.HeaderLogo:hover{
+    box-shadow: 0 0 20px #e87722;
+}*/
+
+.header-menu-list{
+  display: flex;
+  column-gap: 50px;
+}
+
+.header-menu-button{
+  height:50px;
+  text-transform: uppercase;
+}
+
+
+.Main{
+width: 100%;
+height: calc(100% - 50px);
+  
+}
+
+
+
+
+  
+
+ 
+  

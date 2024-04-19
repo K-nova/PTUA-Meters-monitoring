@@ -1,0 +1,17 @@
+
+{
+    "XPoints":["Label 1","Label 2","Label 3"],
+    "Trends":[
+        {
+            "Name": "Bar example 1",
+            "Label": "пример гистограммы 1",
+            "Points":[
+                [30,"red"],
+                [50,"blue"],
+                [20,"green"]
+            ]
+        }
+    ]
+        
+}
+

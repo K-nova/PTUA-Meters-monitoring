@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charts-main</title>
+    <!--подключение файла стилей--> 
+    <link rel="stylesheet" type="text/css" href="../Main/css/Style.css"> 
+    <link rel="stylesheet" type="text/css" href="../Main/css/Style_Tree.css"> 
+    <link rel="stylesheet" type="text/css" href="../Charts/css/Charts-main.css"> 
+    <link rel="stylesheet" type="text/css" href="../Charts/css/ChartsOverview.css"> 
+     <!--подключение скриптов--> 
+     <script src="../npm/node_modules/chart.js/dist/chart.umd.js"></script> 
+</head>
+
+<body class="FullScreenBody">
+    <div class="container">
+
+        <!--область дерева-->
+        <div class="split left" id="tree">
+            <!--структура дерева создается в скрипте-->
+
+            <!--контекстное меню мыши для папки которое создается через скрипт-->
+            <div id="tree-mouseMenuWrapper-folder">
+                <ul>
+                    <li>
+                        <span>Добавить счетчик</span>
+                    </li>
+                    <li>
+                        <span>Добавить папку</span>
+                    </li>
+                    <li>
+                        <span>Переименовать</span>
+                    </li>
+                    <li>
+                        <span>Удалить</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!--контекстное меню мыши для счетчика которое создается через скрипт-->
+            <div id="tree-mouseMenuWrapper-meter">
+                <ul>
+                    <li>
+                        <span>Переименовать</span>
+                    </li>
+                    <li>
+                        <span id="tree-mmw-deleteMeter">Удалить</span>
+                    </li>
+                </ul>
+            </div>
+
+             <!--пустая область для контекстное меню мыши которое создается через скрипт-->
+             <div class="tree-placeholder" id="tree-placeholder"></div>
+
+            <!--контекстное меню мыши для пустой области дерева которое создается через скрипт-->
+            <div id="tree-mouseMenuWrapper-tree">
+                <ul>
+                    <li>
+                        <span>Добавить папку</span>
+                    </li>
+                    
+                </ul>
+            </div>
+
+           
+        </div>
+
+        <!--всплывающее окно добавления папки. Смотри скрипт-->
+
+        <!--всплывающее окно добавления счетчика. Смотри скрипт-->
+        
+        
+
+        <!--ресайзер-->
+        <div class="resizer" id="resizer"></div>
+
+        <!--область содержания-->
+        <div class="split right" id="Workspace">
+
+            <div class="SubHeader" id="ws_subheader">
+                <!--<button class="Subheader-button" id="Subheader-button-back">Назад</button>-->
+                <button class="Subheader-button" id="Subheader-button-up">Вверх</button>
+                <h1 class="subheader_h1">subheader_h1</h1>
+            </div>
+
+            <!--содержание создается в скрипте-->
+
+            
+        </div>
+    </div>
+            
+</div>
+    
+    
+<script type="module" src="Js/Charts_main.js"></script>
+
+</body>
+</html>

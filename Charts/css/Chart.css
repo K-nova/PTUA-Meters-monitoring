@@ -1,0 +1,69 @@
+/*
+.Chart{
+    aspect-ratio: 1;
+    max-width: 1000px;  
+    max-height: 1000px;
+    
+    }
+*/
+
+.ChartToolBoard{
+    margin-top: 20px;
+    border: solid 1px;
+}
+.ChartToolBoard_button.active{
+    background-color: white;
+    color: var(--BackColor);
+}
+
+.ChartToolBoard_button.active:hover{
+    background-color:var(--ActivationColor);
+    transition-duration: var(--transition-duration) ;
+}
+
+/*chart*/
+#ChartContainer{
+    box-sizing: border-box;
+    height: 100%;
+}
+
+/*tab content*/
+
+
+.color-picker{
+    min-height: 40px;
+}
+
+/*изменение свойств pickr*/
+.pcr-button{
+    border: solid 1px var(--BackColor);
+}
+
+.pcr-app .pcr-swatches button{
+    border: solid 1px var(--BackColor);
+}
+
+.pcr-app .pcr-selection .pcr-color-preview{
+    border: solid 1px var(--BackColor);
+}
+
+.pcr-app .pcr-selection .pcr-color-palette{
+    border: solid 1px var(--BackColor);
+}
+
+/*--------*/ 
+#input_addMeter_path{
+    min-width: 50em;
+  }
+  
+  #input_addMeter_name{
+    min-width: 50em;
+  }
+  
+  .checkbox_line_nameInput{
+    min-width: 19em;
+  }
+  
+  .checkbox_line_obisInput{
+    max-width: 5em;
+  }

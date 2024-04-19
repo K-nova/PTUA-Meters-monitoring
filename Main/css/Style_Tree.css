@@ -1,0 +1,138 @@
+/*стили дерева*/
+
+.TreeElement{
+    list-style-type: none;
+    /*padding-left: 20px;*/
+    
+}
+
+
+.TreeElement .TreeElement{
+    display: none;
+}
+
+
+.TreeElement ul {
+    padding-inline-start: 20px; /*отступ от родительского текста*/
+}
+
+
+.TreeElement li {
+    
+     margin: 2px;
+}
+
+.TreeElement-ExpandButton{
+    display: inline-block;
+    margin: 2px;
+    max-height: 25px;
+    max-width: 25px;
+}
+
+
+.TreeElement-MainButton{ 
+    display: inline-flex;
+    height: 25px;
+    border-radius: 0px;
+    width:100%;
+}
+
+
+
+.TreeElement-MainButton-img{
+display: inline;
+  max-height: 25px;
+  margin-inline: 5px;
+}
+
+.tree-item{
+    position: relative;
+}
+
+.tree-input{
+    width: 0;
+    height: 0;
+    appearance: none;
+    display: none;
+}
+
+.tree-title{
+    display: block;
+    padding: 5px;
+    width: 100%;
+    box-sizing: border-box; 
+   
+    
+    font-family: 'Gotham-Black', Arial Black, sans-serif;
+
+    background-color:#FFFFFF;
+    color:var(--BackColor);
+
+    border: none;
+
+    cursor: pointer;
+}
+
+.tree-title:hover{
+    background-color:var(--ActivationColor);
+    transition-duration: var(--transition-duration) ;
+}  
+
+.tree-title-rename{
+    display: block;
+    padding: 5px;
+    width: 100%;
+    
+    font-family: 'Gotham-Black', Arial Black, sans-serif;
+
+    background-color:#FFFFFF;
+    color:var(--BackColor);
+
+    border: none;
+
+    cursor: auto;
+}
+
+
+.tree-input:checked ~.tree-content{
+    display: block;
+}
+
+.tree-expandIcon{
+    display: block;
+
+    border-style: solid;
+    border-width: 5px 0 5px 8.7px;
+    border-color: transparent transparent transparent var(--BackColor);
+    transform: rotate(0deg);
+
+    
+    position: absolute;
+    top:50%;
+    left: 5px;
+
+    transform: translateY(-50%);
+
+    cursor:copy;
+}
+
+.tree-expandIcon.opened{
+    border-style: solid;
+    border-width: 5px 0 5px 8.7px;
+    border-color: transparent transparent transparent var(--BackColor);
+    transform: rotate(90deg);
+
+    top:.5em;
+
+}
+
+.tree-content{
+    display: none;
+}
+
+.tree-placeholder{
+    box-sizing: border-box;
+    height: 100%;
+}
+
+

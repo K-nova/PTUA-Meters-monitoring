@@ -1,0 +1,117 @@
+
+  .container {
+    box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    position: relative;
+    
+  }
+
+ /*--------*/
+  .split {
+    box-sizing: border-box;
+    height: 100%;
+    overflow-y: scroll;
+    position: fixed;
+    top: 0;
+    transition: width 0.3s ease;
+    border: 2px solid var(--BackColor);
+  }
+  
+  .left {
+    left: 0;
+    width: 20%;
+  }
+  
+  .right {
+    right: 0;
+    width: 80%;
+  }
+  
+  .resizer {
+    width: 5px;
+    cursor: ew-resize;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 999;
+    background: #ddd;
+    display: none;
+  }
+
+/*--------*/ 
+
+.SubHeader{
+  display: flex;
+  background-color: var(--SecondMGrayColor);
+}
+
+.Subheader-button{
+  min-height: 50px;
+  max-width: 300px;
+  margin: 10px;
+  flex-grow:1;
+}
+
+.Subheader-h1{
+  flex-grow:7;
+  text-align: center;
+}
+/*--------*/
+#tree-mouseMenuWrapper-folder{
+  display: none;
+}
+
+#tree-mouseMenuWrapper-meter{
+  display: none;
+}
+
+#tree-mouseMenuWrapper-tree{
+  display: none;
+}
+
+/*--------*/  
+.OverviewContainer{
+  box-sizing: border-box;
+  
+}
+.Overview-noContentContainer{
+  display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+/*--------*/  
+.workspace-iframe{
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+}
+
+/*--------*/  
+.demoChartCanvas{
+  box-sizing: border-box;
+  max-width: 800px;
+  max-height: 800px;
+}
+
+/*--------*/ 
+#input_addMeter_path{
+  min-width: 50em;
+}
+
+#input_addMeter_name{
+  min-width: 50em;
+}
+
+.checkbox_line_nameInput{
+  min-width: 19em;
+}
+
+.checkbox_line_obisInput{
+  max-width: 5em;
+}

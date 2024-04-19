@@ -1,0 +1,120 @@
+.slideshow {
+    width: 100%;
+    height: 95vh;
+    position: relative;
+    overflow: hidden;
+    background: black;
+    margin: 20px 0;
+}
+.slideshow-item {
+    display: none;
+
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    opacity: 0;
+   /* animation: slideanim 50s infinite;*/
+}
+
+.slideshow-item.active{
+    display: block;
+    opacity: 1;
+    animation-name: slideanim;
+    animation-duration: .5s;
+    animation-iteration-count: 1;
+
+}
+/*
+.slideshow-item:nth-child(1),
+.slideshow-item:nth-child(1) img {
+    animation-delay: 0;
+}
+.slideshow-item:nth-child(2),
+.slideshow-item:nth-child(2) img {
+    animation-delay: 10s;
+}
+.slideshow-item:nth-child(3),
+.slideshow-item:nth-child(3) img {
+    animation-delay: 20s;
+}
+.slideshow-item:nth-child(4),
+.slideshow-item:nth-child(4) img {
+    animation-delay: 30s;
+}
+.slideshow-item:nth-child(5),
+.slideshow-item:nth-child(5) img {
+    animation-delay: 40s;
+}
+*/
+.slideshow-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: zoom 40s infinite;
+}
+.slideshow-item-text {
+    max-width: 50%;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    /*margin-right: -50%;*/
+    transform: translate(-50%, -50%);
+    background-color: rgba(0,0,0,0.9);
+    color: #fff;
+    padding: 20px 30px;
+    font-family: Verdana, sans-serif;      
+}
+.slideshow-item-text h5 {
+    font-size: 22px;
+    margin: 0 0 10px 0;
+    color: #BFE2FF;
+}
+.slideshow-item-text p {
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+
+.slideshow-item-button{
+    background-color: var(--SecondLGrayColor);
+    color: var(--BackColor);
+}
+
+.slideshow-item-buttonF{
+    display: none;
+    background-color: var(--SecondLGrayColor);
+    color: var(--BackColor);
+}
+
+.slideshow-item-buttonF.active{
+    display: inline;
+}
+
+@keyframes slideanim {
+
+    0%{opacity: 0;}  
+    100%{opacity: 1;}
+}
+@keyframes zoom {
+    50%{
+        transform: scale(1.3);
+    }   
+}
+/*
+@media screen and (max-width: 1100px){
+    .slideshow-item-text{
+        max-width: 75%;
+    }
+}
+@media screen and (max-width: 456px){
+    .slideshow-item-text {
+        bottom: 0;
+        left: 0;
+        max-width: 100%;
+    }
+    .slideshow-item-text h5 {
+        font-size: 18px;
+    }
+    .slideshow-item-text p {
+        font-size: 13px;
+    }
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide Show</title>
+    <!--подключение файла стилей--> 
+    <link rel="stylesheet" type="text/css" href="css/SlideShow.css"> 
+    <link rel="stylesheet" type="text/css" href="css/Style.css"> 
+</head>
+
+<body>
+    <div class="slideshow">
+        <div class="slideshow-item">
+            <img src="Data/Siemens_VAI_03_fertig_Retouch_270514.jpg" alt="">
+            <div class="slideshow-item-text">
+                <h5>Общее описание</h5>
+                <p>Данный проект разработан как прототип веб-интерфейса под возможный проект АСК(Т)ОЕ: 
+                автоматизированной системы коммерческого (технического) учета электроэнергии</p>
+                <p>Общая тема прототипа: возможность анализа потребления электроэнергии с помощью трендов</p>
+                <button class="slideshow-item-button">далее</button>
+                <button class="slideshow-item-buttonF">старт</button>
+            </div>
+            
+        </div>
+        <div class="slideshow-item">
+            <img src="Data/Imagecampaign_Digitalization_PT_normal_RGB_casual_man.jpg" alt="">
+            <div class="slideshow-item-text">
+                <h5>Взаимодействие с бэкэндом</h5>
+                <p>В прототипе симулируется взаимодействие с бэкэндом. Т.е. все данные которые видны в трендах
+                явлются сгенерированы псевдослучайным образом самим веб-интерфейсом</p>
+                <button class="slideshow-item-button">далее</button>
+                <button class="slideshow-item-buttonF">старт</button>
+            </div>
+        </div>
+        <div class="slideshow-item">
+            <img src="Data/317-GRZ-IT 2014_0284-H_ret1.jpg" alt="">
+            <div class="slideshow-item-text">
+                <h5>Сохранение изменений.</h5>
+                <p>Изменения интерфейса под пользователя возможны (фон тренда, вид трендов и пр.). Однако данные
+                изменения хронятся в локальной сессии, поэтому при закрытии вкладки браузера все изменения
+                будут потеряны. Не в демонстрационной версии изменения интерфейса предполагается хранить
+                в локальном хранилище браузера, в таком случае изменения будут хранится до очистки локальных 
+                переменных браузера</p>
+                <button class="slideshow-item-button">далее</button>
+                <button class="slideshow-item-buttonF">старт</button>
+            </div>
+        </div>
+        <div class="slideshow-item">
+            <img src="Data/SiemensVAI_Innovation_02.jpg" alt="">
+            <div class="slideshow-item-text">
+                <h5>Разработка</h5>
+                <p>Время создания: 3.5 месяца неспешной работы.</p> 
+                <p>Как показал опыт, разработка своего веб-интерфейсва ГОРАЗДО БОЛЕЕ ТРУДОЕМКАЯ чем разработка
+                    интерфейса СКАДА-систем. Обратной стороной является почти неограниченые возможности в реализации задумок</p> 
+                <p>Языка програмирования: стандартный веб набор - HTML, CSS, JS.</p>   
+                <p>Задействовано более 6 библиотек/плагинов. Самя большая из которых chart.js - библиотека
+                    отрисовки графиков на веб-странице. Для расширения ее функционала также был создан свой 
+                    собтвенный плагин</p>  
+                <p>С целью сокращения времени на разработка данного прототипа пришлось отказатся от некоторого
+                    функционала, который задумывался (драг-энд-дроп в окне навигации, таблица отсчетов и пр.)</p> 
+                <button class="slideshow-item-button">далее</button>
+                <button class="slideshow-item-buttonF">старт</button>         
+            </div>
+        </div>
+        <div class="slideshow-item">
+            <img src="Data/Imagecampaign_Digitalization_PT_normal_RGB_worker_woman.jpg" alt="">
+            <div class="slideshow-item-text">
+                <h5>Нажмите далее, чтобы перейти непосредственно к интерфейсу</h5>
+                <p></p>  
+                <button class="slideshow-item-button">далее</button>         
+            </div>
+        </div>
+    </div>
+    
+</body>
+
+<script type="module" src="./Js/SlideShow.js"> </script>
+</html>
