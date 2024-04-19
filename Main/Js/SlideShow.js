@@ -20,7 +20,7 @@ let slideshowButtonELF=()=>{
         sessionStorage.setItem(locStorName('slideShow_passedSteps'), true);
 
         let Main=window.parent.document.querySelector('#Main');
-        Main.src='../Charts/Charts-main.html';
+        Main.data='../Charts/Charts-main.html';
     }
 }
 
@@ -36,7 +36,7 @@ for(let slideshowButtonF of slideshowButtonFs){
     slideshowButtonF.addEventListener('click',()=>{
 
         let Main=window.parent.document.querySelector('#Main');
-        Main.src='../Charts/Charts-main.html';
+        Main.data='../Charts/Charts-main.html';
     
     });
 }

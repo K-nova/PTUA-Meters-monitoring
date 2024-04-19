@@ -1096,8 +1096,8 @@ export class ChartsCollection{
           
         //создаем область для контента
         
-        this.workspaceContent.chartPage = document.createElement("iframe");
-        this.workspaceContent.chartPage.src='../Charts/Chart.html';
+        this.workspaceContent.chartPage = document.createElement("object");
+        this.workspaceContent.chartPage.data='../Charts/Chart.html';
         this.workspaceContent.chartPage.className='workspace-iframe';
         this.workspace.element.appendChild(this.workspaceContent.chartPage);
 
