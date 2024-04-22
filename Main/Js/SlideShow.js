@@ -36,7 +36,7 @@ for(let slideshowButtonF of slideshowButtonFs){
     slideshowButtonF.addEventListener('click',()=>{
 
         let Main=window.parent.document.querySelector('#Main');
-        Main.data='../Charts/Charts-main.html';
+        Main.data='Charts/Charts-main.html';
     
     });
 }
