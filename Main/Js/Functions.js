@@ -1098,7 +1098,7 @@ export class ChartsCollection{
         
         this.workspaceContent.chartPage = document.createElement("object");
         this.workspaceContent.chartPage.type='text/html';
-        this.workspaceContent.chartPage.data='Charts/Chart.html';
+        this.workspaceContent.chartPage.data='Chart.html';
         this.workspaceContent.chartPage.className='workspace-iframe';
         this.workspace.element.appendChild(this.workspaceContent.chartPage);
 
