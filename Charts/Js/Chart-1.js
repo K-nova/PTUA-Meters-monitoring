@@ -51,13 +51,13 @@ loadDataToChart(DFSType,DFSstartVal,DFSecondVal);
 
 //------------настройки счетчика
 //масштабирование
-let meterSettings_pageItem=document.querySelector('#meterSettings');
-meterSettings_pageItem.addEventListener('click', ()=>{
-    let parentDocument = window.parent.document;
-    let workspace_iframe= parentDocument.querySelector('.workspace-iframe');
-    workspace_iframe.style.height=`${document.body.offsetHeight+50}px`;
+// let meterSettings_pageItem=document.querySelector('#meterSettings');
+// meterSettings_pageItem.addEventListener('click', ()=>{
+//     let parentDocument = window.parent.document;
+//     let workspace_iframe= parentDocument.querySelector('.workspace-iframe');
+//     workspace_iframe.style.minHeight =`${document.body.offsetHeight+50}px`;
 
-})
+// })
 
 let meterSettingsWrap=document.querySelector('#meterSettingsWrap');
 let MeterSetting=new PageElements.MeterSettingsContent(meterSettingsWrap);
