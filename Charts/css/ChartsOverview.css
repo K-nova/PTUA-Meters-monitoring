@@ -6,8 +6,8 @@
     /*aspect-ratio: 1;*/
 
     background-color: white;
-    min-width: 400px;  
-    min-height: 400px;
+    min-width: 200px;  
+    min-height: 200px;
     margin: 10px;
     position: relative; /*необходим для абсолютного позиционирования и масштабировани след. элемента*/
 }
@@ -30,8 +30,8 @@
 
 .Overview-Iframe, .Overview-picture{
     display: block;
-    min-width: 400px;  
-    min-height: 350px;
+    max-width: 300px;  
+    max-height: 300px;
     border-style: none;
     border: 5px solid var(--BackColor);
 }
