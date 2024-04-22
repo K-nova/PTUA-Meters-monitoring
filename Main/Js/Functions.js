@@ -1032,25 +1032,25 @@ export class ChartsCollection{
 
                 //рисунок кнопки обзора -папка
                 if(dataItem.type=='folder'){
-                    img.src="Main/Data/Folder.png";
+                    img.src="../Main/Data/Folder.png";
                 }
                 //рисунок кнопки обзора -график
                 else{
                     switch (dataItem.ChartType) {
                         case 'line':
-                            img.src="Charts/Data/line-chart-icon.png";
+                            img.src="Data/line-chart-icon.png";
                             break;
                         case 'bar':
-                            img.src="Charts/Data/bar-chart-icon.png";
+                            img.src="Data/bar-chart-icon.png";
                             break;    
                         case "pie":
-                            img.src="Charts/Data/pie-chart-icon.png";
+                            img.src="Data/pie-chart-icon.png";
                             break;
                         case "doughnut":
-                            img.src="Charts/Data/doughnut-chart-icon.png";
+                            img.src="Data/doughnut-chart-icon.png";
                             break;    
                         default:
-                            img.src="Charts/Data/line-chart-icon.png";
+                            img.src="Data/line-chart-icon.png";
                             break;
                     }
                     
@@ -1076,7 +1076,7 @@ export class ChartsCollection{
 
             let noContentImg=document.createElement("img");
             noContentImg.className="Overview-noContentImg";
-            noContentImg.src="Main/Data/NoContent.png";
+            noContentImg.src="../Main/Data/NoContent.png";
             noContentColumn.appendChild(noContentImg);   
             
             let noContentText=document.createElement('h1');
