@@ -1,5 +1,5 @@
 import {ChartsCollection, PageElements, trendSetpoints,
-    ServerDataExchange, TrainingMessages} from "../../Main/Js/Functions.js";
+    ServerDataExchange} from "../../Main/Js/Functions.js";
 
 
 //создаем структуру
@@ -119,7 +119,7 @@ MeterSettingsContent.applyButton.addEventListener('click',()=>{
 
     //команда добавляения данных счетчика на сервер
     
-    ServerDataExchange.addItem({
+    let addMeterResponse=ServerDataExchange.addItem({
         idPath:ChartColl.mouseFTreeMenuEventPath.idPath,
         text:MeterSettingsContent.mSArea1.input_meter_name.value ||
         MeterSettingsContent.mSArea1.input_meter_name.placeholder,
@@ -127,8 +127,16 @@ MeterSettingsContent.applyButton.addEventListener('click',()=>{
 
     })
 
-    //пересобираем дерево и воркспейс
-    ChartColl.construct();
+    if(!addMeterResponse.err){
+        //пересобираем дерево и воркспейс
+        ChartColl.construct();
+    }else{
+        if(addMeterResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
+            MeterSettingsContent.addNameErr('Такое имя уже существует в данной папке!');          
+
+        }
+    }
+    
 
 
 })

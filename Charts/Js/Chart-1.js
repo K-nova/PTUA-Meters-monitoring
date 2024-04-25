@@ -1,7 +1,8 @@
 import {PageElements, ChartCtrl, TrainingMessages, locStorName,
      ServerDataExchange, DateTime, ChartsCollection} from "../../Main/Js/Functions.js";
+
+ //import{ChartColl} from '/Charts/Js/Charts_main.js';    
  
-//import {forChartPage} from  "../Js/Charts_main.js";
 //console.log(forChartPage)
 
 //------диаграмма
@@ -50,14 +51,6 @@ let DFSType=2//мин макс время;
 loadDataToChart(DFSType,DFSstartVal,DFSecondVal);
 
 //------------настройки счетчика
-//масштабирование
-// let meterSettings_pageItem=document.querySelector('#meterSettings');
-// meterSettings_pageItem.addEventListener('click', ()=>{
-//     let parentDocument = window.parent.document;
-//     let workspace_iframe= parentDocument.querySelector('.workspace-iframe');
-//     workspace_iframe.style.minHeight =`${document.body.offsetHeight+50}px`;
-
-// })
 
 let meterSettingsWrap=document.querySelector('#meterSettingsWrap');
 let MeterSetting=new PageElements.MeterSettingsContent(meterSettingsWrap);
@@ -98,17 +91,20 @@ MeterSetting.mSArea3.subArea2.column3.select.value=meterSettingsData.exchangeTim
 //кнопка применить
 MeterSetting.applyButton.addEventListener('click',()=>{
     //формируем данные настройки счетчика
-    let meterSettings={};
-    meterSettings.ip=[];
+    let setMeterData={text:{}, meterSettings:{}};
+    //общее
+    setMeterData.text=MeterSetting.mSArea1.input_meter_name.value;
+    //подключение
+    setMeterData.meterSettings.ip=[];
     for(let i=0; i<4; i++){
-        meterSettings.ip[i]=MeterSetting.mSArea2.input_ip[i].value;
+        setMeterData.meterSettings.ip[i]=MeterSetting.mSArea2.input_ip[i].value;
     }
-    meterSettings.rs_type=MeterSetting.mSArea2.select_rs_type.value;
-    meterSettings.rs_port=MeterSetting.mSArea2.input_rs_port.value;
-    meterSettings.rs485_adress=MeterSetting.mSArea2.input_rs485_adress.value;
+    setMeterData.meterSettings.rs_type=MeterSetting.mSArea2.select_rs_type.value;
+    setMeterData.meterSettings.rs_port=MeterSetting.mSArea2.input_rs_port.value;
+    setMeterData.meterSettings.rs485_adress=MeterSetting.mSArea2.input_rs485_adress.value;
 
-    
-    meterSettings.dataExchange=[]
+    //параметры
+    setMeterData.meterSettings.dataExchange=[]
     let i=0;
     for (let checkBoxLine of MeterSetting.mSArea3.subArea1.column1.cbLinesContent){
         let dataExchangeItem={
@@ -117,7 +113,7 @@ MeterSetting.applyButton.addEventListener('click',()=>{
             label: checkBoxLine.parNameInput.value || checkBoxLine.parNameInput.placeholder,
             obisCode:checkBoxLine.parObisCodeInput.value || checkBoxLine.parObisCodeInput.placeholder
         }
-        meterSettings.dataExchange.push(dataExchangeItem);
+        setMeterData.meterSettings.dataExchange.push(dataExchangeItem);
         i++;
     }
     for (let checkBoxLine of MeterSetting.mSArea3.subArea1.column2.cbLinesContent){
@@ -127,21 +123,30 @@ MeterSetting.applyButton.addEventListener('click',()=>{
             label: checkBoxLine.parNameInput.value || checkBoxLine.parNameInput.placeholder,
             obisCode:checkBoxLine.parObisCodeInput.value || checkBoxLine.parObisCodeInput.placeholder
         }
-        meterSettings.dataExchange.push(dataExchangeItem);
+        setMeterData.meterSettings.dataExchange.push(dataExchangeItem);
         i++;
     }
 
-    meterSettings.exchangeTimeValue=MeterSetting.mSArea3.subArea2.column1.input_metter_timeValue.value;
-    meterSettings.exchangeTimeType=MeterSetting.mSArea3.subArea2.column3.select.value;
+    setMeterData.meterSettings.exchangeTimeValue=MeterSetting.mSArea3.subArea2.column1.input_metter_timeValue.value;
+    setMeterData.meterSettings.exchangeTimeType=MeterSetting.mSArea3.subArea2.column3.select.value;
 
 
     //команда изменения данных счетчика на сервере
     
-    ServerDataExchange.setMeterSettings({
+    let setMeterResponse=ServerDataExchange.setMeterSettings({
         idPath:forChartPageData.idPath,
-        meterSettings:meterSettings
+        text:setMeterData.text,
+        meterSettings:setMeterData.meterSettings
 
     })
+
+    if(setMeterResponse.err){
+        
+        if(setMeterResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
+            MeterSetting.addNameErr('Такое имя уже существует в данной папке!');          
+
+        }
+    }
 })
 
 //training messages
@@ -156,6 +161,16 @@ let TrainingMessagesMS=new TrainingMessages('meterSettings',[
 
 
 TrainingMessagesMS.hide();
+
+let cover=window.parent.document.querySelector('.cover');
+let TMMSinterval=setInterval(()=>{
+    
+    if(cover.style.display=='block'){TrainingMessagesMS.hide();}
+    else{
+        TrainingMessagesMS.show();
+    }
+
+},1000);
     
 meterSettings_checkbox.addEventListener('click',()=>{
     meterSettingsHidden=!meterSettingsHidden;
@@ -246,6 +261,18 @@ let TrainingMessagesTS=new TrainingMessages('trendSettings',[
     ]);
 
 TrainingMessagesTS.hide();
+
+let TMTSinterval=setInterval(()=>{
+    
+    if(cover.style.display=='block'){TrainingMessagesTS.hide();}
+    else{
+        if(ChartSettingsPopUp.displayed){
+            TrainingMessagesTS.show();
+        }
+        
+    }
+
+},1000);
 
 let CSPopUpCtrlVisibility=()=>{
     ChartSettingsPopUp.main.addEventListener('transitionend', ()=>{
@@ -348,6 +375,18 @@ let TrainingMessagesC=new TrainingMessages('chart',[
     {target:document.getElementById('Chart'), text: 'движение мыши с ее зажатой кнопкой позволяет перемещатся вдоль осей'},
     {target:OpenSettingsPopUp, text: 'нажмите, чтобы настроить общий вид графика<br>фон, цвета трендов, оси и пр.'},
     ]);
+
+    let TMCinterval=setInterval(()=>{
+    
+        if(cover.style.display=='block'){TrainingMessagesC.hide();}
+        else{
+            if(TrainingMessagesMS.trainingFinished){
+                TrainingMessagesC.show();
+            }
+            
+        }
+    
+    },1000);
 
 
 

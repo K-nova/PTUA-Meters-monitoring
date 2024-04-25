@@ -163,6 +163,7 @@ function isJSON(str) {
 export class ServerDataExchange{
     static DataExchangeSimulation= true;
     static NO_CHANGES='nc';
+    static ERR_NAMEALREADYEXIST='err: name already exist in folder';
     
     static Aux={   
         treeDataLocStorageName:'treeDataLocStorageName',
@@ -469,6 +470,7 @@ export class ServerDataExchange{
 
     //добавить в струкутуру дерева данные счетчика
     static addItem=function(data){
+        let response={done:false, err:false, errDescription:''};
         //симуляция обмена данными с сервером
         if(this.DataExchangeSimulation){
             let newItem={};
@@ -489,31 +491,48 @@ export class ServerDataExchange{
             }else{
                 foundItem=foundResult.targetFolder;
             }
-
-            //определение Id
-            let idArr=[];
+            //проверяем ошибки такого же имени
+            let nameExist=false;
             for(let item of foundItem){
-                idArr.push(Number(item.Id));
+                if(item.text==data.text){
+                    nameExist=true;
+                    response.err=true;
+                    response.errDescription=this.ERR_NAMEALREADYEXIST;
+                    break;
+                }
             }
 
-            newItem.Id=Math.max(...idArr)+1;
-            newItem.Id=newItem.Id.toString();
+            if(!nameExist){
+                //определение Id
+                let idArr=[];
+                for(let item of foundItem){
+                    idArr.push(Number(item.Id));
+                }
 
-            //определение текста
-            newItem.text=data.text;
+                newItem.Id=Math.max(...idArr)+1;
+                newItem.Id=newItem.Id.toString();
 
-            //определение типа
-            newItem.type=data.type;
+                //определение текста
+                newItem.text=data.text;
 
-            //добавляем данные настройки счетчика
-            newItem.meterSettings=data.meterSettings;
+                //определение типа
+                newItem.type=data.type;
 
-            //интегрируем в данные дерева и сохраняем локальной сессии
-            foundItem.push(newItem);
-            sessionStorage.setItem(locStorName(this.Aux.treeDataLocStorageName),JSON.stringify(treeData) );
+                //добавляем данные настройки счетчика
+                newItem.meterSettings=data.meterSettings;
 
+                //интегрируем в данные дерева и сохраняем локальной сессии
+                foundItem.push(newItem);
+                sessionStorage.setItem(locStorName(this.Aux.treeDataLocStorageName),JSON.stringify(treeData) );
+                
+                //статус выполнения 
+                response.done=true
+
+            }
+            
 
         }
+        return response;
     }
 
     //удалить из струкутуры дерева данные счетчика
@@ -544,6 +563,7 @@ export class ServerDataExchange{
 
     //переименовать папку или счетчик
     static renameItem=function(data){
+        let response={done:false, err:false, errDescription:''};
         //симуляция обмена данными с сервером
         if(this.DataExchangeSimulation){
             //делаем запрос из локальной сессии
@@ -551,13 +571,30 @@ export class ServerDataExchange{
             //поиск объекта
             let foundResult=this.Aux.findItem(data.idPath,treeData);
 
-            //устанавливаем новое имя объекта
-            foundResult.item.text=data.text;
+            //проверяем ошибки такого же имени
+            let nameExist=false;
+            for(let item of foundResult.targetFolder){
+                if(item.text==data.text  && item.Id!=foundResult.item.Id){
+                    nameExist=true;
+                    response.err=true;
+                    response.errDescription=this.ERR_NAMEALREADYEXIST;
+                    break;
+                }
+            }
 
-            //записываем данные обратно в сессию
-            sessionStorage.setItem(locStorName(this.Aux.treeDataLocStorageName),JSON.stringify(treeData) );
+            if(!nameExist){
+                //устанавливаем новое имя объекта
+                foundResult.item.text=data.text;
 
+                //записываем данные обратно в сессию
+                sessionStorage.setItem(locStorName(this.Aux.treeDataLocStorageName),JSON.stringify(treeData) );
+            
+                //статус выполнения 
+                response.done=true;
+            }
+            
         }
+        return response;
     }
 
     //получить настройки счетчика
@@ -584,17 +621,42 @@ export class ServerDataExchange{
 
     //изменить настройки счетчика
     static setMeterSettings=function(data){
+        let response={done:false, err:false, errDescription:''};
+
         //симуляция обмена данными с сервером
         if(this.DataExchangeSimulation){
             //делаем запрос из локальной сессии
             let treeData=JSON.parse(sessionStorage.getItem(locStorName(this.Aux.treeDataLocStorageName)));
             //поиск объекта
             let foundResult=this.Aux.findItem(data.idPath,treeData);
-            //изменение настроек
-            foundResult.item.meterSettings=data.meterSettings;
-            //сохраняем локальной сессии
-            sessionStorage.setItem(locStorName(this.Aux.treeDataLocStorageName),JSON.stringify(treeData) );
+
+            //проверяем ошибки такого же имени
+            let nameExist=false;
+            for(let item of foundResult.targetFolder){
+                if(item.text==data.text && item.Id!=foundResult.item.Id){
+                    nameExist=true;
+                    response.err=true;
+                    response.errDescription=this.ERR_NAMEALREADYEXIST;
+                    break;
+                }
+            }
+
+            if(!nameExist){
+                //изменение имени
+                foundResult.item.text=data.text;
+                //изменение настроек
+                foundResult.item.meterSettings=data.meterSettings;
+                //сохраняем локальной сессии
+                 sessionStorage.setItem(locStorName(this.Aux.treeDataLocStorageName),JSON.stringify(treeData) );
+            
+                //статус выполнения 
+                response.done=true;
+            }
+            
+            
+           
         }
+        return response;
     }
     
 }
@@ -616,7 +678,9 @@ export class ChartsCollection{
 
         this.tree=document.querySelector('#tree');
 
+        this.workspace_wrapper=document.querySelector('#workspace_wrapper');
         this.workspace.element=document.querySelector('#Workspace');
+        this.workspace_cover.init();
         this.wsSubheader=document.querySelector('#ws_subheader');
         this.wsSubheaderText=document.querySelector('.subheader_h1');
         this.wsUpButton=document.querySelector('#Subheader-button-up');
@@ -698,14 +762,7 @@ export class ChartsCollection{
         this.construct();
 
         //------------training messages
-        let TrainingMessagesInst=new TrainingMessages('tree',[
-            {target:this.tree.querySelector('.tree-item'), text:'нажмите на корневой элемент в навигационной панеле,<br>'+
-            'чтобы отобразить содержание папки или перейти к данными выбранного счетчика'},
-            {target:this.tree.querySelector('.tree-item'), text:'нажмите правой кнопкой мыши по элементу в навигационой панели,<br>'+
-            'чтобы открыть контекстное меню где можно удалить/добавить папку или счетчик и пр.'},
-            {target:this.tree.querySelector('.tree-placeholder'), text:'нажмите правой кнопкой мыши по пустому полю в навигационой панели,<br>'+
-            'чтобы открыть контекстное меню где можно удалить/добавить папку'}
-        ]);
+        this.#treeTrainingMsgs();
         
     };
 
@@ -714,6 +771,7 @@ export class ChartsCollection{
     tree;
     treePlaceholder;
     treeData;
+    treeTrainingMsg;
 
     mouseTTreeMenuWrapper;
     mouseTTreeMenuContent;
@@ -730,9 +788,31 @@ export class ChartsCollection{
     addFolder2PopUp;
     addMeterPopUp;
 
+    workspace_wrapper;
+    workspace_cover={
+        body:{},
+        showed:false,
+        init:()=>{
+            this.workspace_cover.body=document.createElement('div');
+            this.workspace_cover.body.className='cover';
+            this.workspace_wrapper.appendChild(this.workspace_cover.body);
+            
+        },
+        show:()=>{
+            let paretnRect= this.workspace_wrapper.getBoundingClientRect();
+            this.workspace_cover.body.style.top=`${paretnRect.top}px`;
+            this.workspace_cover.body.style.display='block';
+            this.workspace_cover.showed=true;
+        },
 
+        hide:()=>{
+            this.workspace_cover.body.style.display='none';
+            this.workspace_cover.showed=false;
+        }
+    };
     workspace={element:{}, contentData:{}};
     workspaceContent={};
+    overviewTrainingMsg;
 
     wsSubheader;
     wsSubheaderText;
@@ -841,6 +921,7 @@ export class ChartsCollection{
                     this.mouseFTreeMenuEventPath.treeDataItem=dataItem;
                     PageElements.createMouseContextMenu(event, this.mouseFTreeMenuWrapper);
                 })
+
                 treeLabel.addEventListener('click',(event)=>{
                     if(!treeLabel.onEdit){
                         treeInput.click();
@@ -852,10 +933,20 @@ export class ChartsCollection{
                         treeLabel.className='tree-title';
                         treeLabel.setAttribute('readonly', 'true');
                         treeLabel.onEdit=false;
-                        ServerDataExchange.renameItem({
+                        let renameItemResponse=ServerDataExchange.renameItem({
                             idPath:this.mouseFTreeMenuEventPath.idPath,
                             text: treeLabel.value
                         });
+
+                        if(renameItemResponse.err){
+                            if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
+                                treeLabel.value=dataItem.text;
+                                alert('Такое имя уже существует в данной папке!');
+                            }
+                        }else{
+                            dataItem.text=treeLabel.value;
+                        }
+                        
                     }
                 })
 
@@ -1061,7 +1152,7 @@ export class ChartsCollection{
 
             }
             //------------training messages
-            let TrainingMessagesInst=new TrainingMessages('overview',[
+            this.overviewTrainingMsg=new TrainingMessages('overview',[
                 {target:this.workspaceContent.overviewButtons[0], text:'нажмите на одну из кнопок, чтоб перейти на страницу счетчика или в подпапку'}
                 ]);
 
@@ -1309,6 +1400,42 @@ export class ChartsCollection{
             this.openByPath(pathIds);
         })
     }
+
+    //тренировочные сообщения дерева
+    #treeTrainingMsgs=()=>{
+        this.treeTrainingMsg=new TrainingMessages('tree',[
+            {target:this.tree.querySelector('.tree-item'), text:'нажмите на корневой элемент в навигационной панеле,<br>'+
+            'чтобы отобразить содержание папки или перейти к данными выбранного счетчика'},
+            {target:this.tree.querySelector('.tree-item'), text:'нажмите правой кнопкой мыши по элементу в навигационой панели,<br>'+
+            'чтобы открыть контекстное меню где можно удалить/добавить папку или счетчик и пр.'},
+            {target:this.tree.querySelector('.tree-placeholder'), text:'нажмите правой кнопкой мыши по пустому полю в навигационой панели,<br>'+
+            'чтобы открыть контекстное меню где можно удалить/добавить папку'}
+        ]);
+
+        let coverCtrl=()=>{
+            if(!this.treeTrainingMsg.trainingFinished){
+                this.workspace_cover.show();
+
+                if(this.workspaceContent.overview!=undefined){
+                    this.overviewTrainingMsg.hide();
+                }
+                
+
+                let msg_closeButton=this.treeTrainingMsg.messages[this.treeTrainingMsg.msgNum].closeButton;
+                msg_closeButton.addEventListener('click',()=>{
+                    coverCtrl();
+                })
+            }else{
+                this.workspace_cover.hide();
+                if(this.workspaceContent.overview!=undefined){
+                    this.overviewTrainingMsg.show();
+                }
+            }
+        }
+
+        coverCtrl();
+    }
+        
 
     
 }
@@ -2397,13 +2524,16 @@ export class ChartCtrl{
 //управление сообщениями обучения
 export class TrainingMessages{
     constructor(id,targetOptions){
-        //делаем запрос из локальной сессии
+
+        //--создаем первое тренирочные сообщения
         let optionNum=sessionStorage.getItem(locStorName(this.#currMsgMem+id));
         if(optionNum!=undefined && optionNum>=0){
             this.optionsNum=optionNum;
         }
+
+        this.trainingFinished=!(this.optionsNum<=targetOptions.length-1);
         
-        if(this.optionsNum<=targetOptions.length-1){
+        if(!this.trainingFinished){
             let message=new PageElements.TrainingMessage(targetOptions[this.optionsNum].target,
                 targetOptions[this.optionsNum].text);
             this.messages.push(message);
@@ -2413,7 +2543,7 @@ export class TrainingMessages{
         }
         
 
-        //---устанавливаем последовательное появление сообщенийс помощью обсервера
+        //---создаем последующие трен. сообщения и устанавливаем последовательное их появление с помощью обсервера
         // Настройки обсервера
         let mainObsConfig = { attributes: true, attributeFilter:['class'] };
 
@@ -2422,10 +2552,13 @@ export class TrainingMessages{
             for(let mutation of mutations){
                 if(mutation.target.className=='trainingMessage' &&
                  mutation.target==this.messages[this.msgNum].wraper && !this.#hidden){
-                    this.optionsNum++;
-                    this.msgNum++
 
-                    if(this.optionsNum<=targetOptions.length-1){
+                    this.optionsNum++;
+                    this.msgNum++;
+
+                    this.trainingFinished=!(this.optionsNum<=targetOptions.length-1);
+
+                    if(!this.trainingFinished){
                         //создаем новое сообщение
                         let message=new PageElements.TrainingMessage(targetOptions[this.optionsNum].target,
                             targetOptions[this.optionsNum].text);
@@ -2452,8 +2585,8 @@ export class TrainingMessages{
         //обсервер
         let mainObserver = new MutationObserver(mainObsCallback);  
 
-        if(this.optionsNum<=targetOptions.length-1){
-            //добавляем обсервер к сообщению помощи
+        if(!this.trainingFinished){
+            //непосредственный вызов функции сооздания новых сообщений
             mainObserver.observe(this.messages[this.msgNum].wraper, mainObsConfig);
         }
         
@@ -2462,6 +2595,8 @@ export class TrainingMessages{
     messages=[];
     optionsNum=0;
     msgNum=0;
+
+    trainingFinished=false;
 
     #hidden=false;
 
@@ -2949,6 +3084,7 @@ export var PageElements={
             topic:{},
             label_meter_path:{},
             input_meter_path:{},
+            wraper_meter_name:{},
             label_meter_name:{},
             input_meter_name:{},
         };
@@ -3034,14 +3170,17 @@ export var PageElements={
             this.mSArea1.input_meter_path.className='input notAllowed'
             this.mSArea1.body.appendChild(this.mSArea1.input_meter_path);
 
+            this.mSArea1.wraper_meter_name=document.createElement('div');
+            this.mSArea1.body.appendChild(this.mSArea1.wraper_meter_name);
+
             this.mSArea1.label_meter_name=document.createElement('h4');
             this.mSArea1.label_meter_name.innerText='Имя:';
-            this.mSArea1.body.appendChild(this.mSArea1.label_meter_name);
+            this.mSArea1.wraper_meter_name.appendChild(this.mSArea1.label_meter_name);
 
             this.mSArea1.input_meter_name=document.createElement('input');
             this.mSArea1.input_meter_name.type='text';
             this.mSArea1.input_meter_name.placeholder='Счетчик1'
-            this.mSArea1.body.appendChild(this.mSArea1.input_meter_name);
+            this.mSArea1.wraper_meter_name.appendChild(this.mSArea1.input_meter_name);
         }
 
         #createMSArea2=function(){
@@ -3240,6 +3379,22 @@ export var PageElements={
             this.mSArea3.subArea2.column3.selectOptions[3].innerText='1 сутки'
             this.mSArea3.subArea2.column3.select.appendChild(this.mSArea3.subArea2.column3.selectOptions[3]);
             this.mSArea3.subArea2.column3.body.appendChild(this.mSArea3.subArea2.column3.select);
+        }
+
+        addNameErr=function(text){
+            let errText_nameExist=document.createElement('div');
+            errText_nameExist.classList.add('text');
+            errText_nameExist.classList.add('err');
+            errText_nameExist.innerText=text;
+            this.mSArea1.wraper_meter_name.appendChild(errText_nameExist);
+
+            this.mSArea1.input_meter_name.classList.add('input');
+            this.mSArea1.input_meter_name.classList.add('err');
+
+            this.mSArea1.input_meter_name.addEventListener('input',()=>{
+                this.mSArea1.input_meter_name.classList.remove('err');
+                errText_nameExist.remove();
+            })
         }
 
         
