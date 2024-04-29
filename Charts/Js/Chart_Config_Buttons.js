@@ -1,6 +1,6 @@
 import {DateTime} from "../../Main/Js/Functions.js";
 
-import {Chart,PopUpApply,chartContainer} from "./Chart-1.js";
+import {Chart,ChartSettingsPopUp,chartSetOCA,chartContainer} from "./Chart-1.js";
 
 import {CheckBoxArr,DotSelector,LineWidthInput,borderColor_trends, valueAxisList,
      CB_Filled,range_TrendTension, select_TrendType} from "./Chart_Config_tab1.js";
@@ -11,13 +11,12 @@ import {borderColor_Xscales,
     borderColor_XScaleline,XScalelineWidth,borderColor_XScaleGrid,
     XScaleGridWidth, XScaleTimeRangeSettings} from "./Chart_Config_tab3.js";
 
-import {borderColor_Yscales, YscaleName, YscalePosSelector, YscaleTitleInput, YscaleNameInput,
+import {YscaleList, borderColor_Yscales,  YscalePosSelector, YscaleTitleInput, YscaleNameInput,
         borderColor_YScaleline,YScalelineWidth,borderColor_YScaleGrid,
         YScaleGridWidth, YscaleFrom_input, YscaleTo_input, YscaleNameListBuild} from "./Chart_Config_tab4.js";    
 
-//----------кнопка применить
-PopUpApply.addEventListener("click", ()=>{
-
+//функция применения настроек
+let acceptSettings=()=>{
     //настройки трендов
     //проходим по выбраным трендам
     CheckBoxArr.forEach((checkbox)=>{
@@ -28,6 +27,8 @@ PopUpApply.addEventListener("click", ()=>{
             Chart.setDatasetProp(checkbox.value,select_TrendType.value);
 
             Chart.setDatasetProp(checkbox.value,`borderColor=${borderColor_trends}`);
+            Chart.setDatasetProp(checkbox.value,`backgroundColor=${borderColor_trends+'7F'}`);
+
             
             Chart.setDatasetProp(checkbox.value,`fill=${CB_Filled.checked}`);
 
@@ -68,30 +69,52 @@ PopUpApply.addEventListener("click", ()=>{
     Chart.setOptionsProp('scales=x=grid=color='+borderColor_XScaleGrid);
     Chart.setOptionsProp('scales=x=grid=lineWidth='+XScaleGridWidth.value);
 
-    
-    //настройки оси y
-    Chart.setOptionsProp(`scales=${YscaleName}=name=${YscaleNameInput.value}`);
+    //настройки осей y
+    let yScaleName;
+    for(let yScaleCBox of YscaleList.checkBoxes){
+        if(yScaleCBox.checked){
+            yScaleName=yScaleCBox.value;
 
-    Chart.setOptionsProp(`scales=${YscaleName}=title=text=${YscaleTitleInput.value}`);
+            Chart.setOptionsProp(`scales=${yScaleName}=name=${YscaleNameInput.value}`);
 
-    Chart.setOptionsProp(`scales=${YscaleName}=max=${YscaleTo_input.value}`);
-    Chart.setOptionsProp(`scales=${YscaleName}=min=${YscaleFrom_input.value}`);
+            Chart.setOptionsProp(`scales=${yScaleName}=title=text=${YscaleTitleInput.value}`);
 
-    Chart.setOptionsProp(`scales=${YscaleName}=position=${YscalePosSelector.value}`);
+            Chart.setOptionsProp(`scales=${yScaleName}=max=${YscaleTo_input.value}`);
+            Chart.setOptionsProp(`scales=${yScaleName}=min=${YscaleFrom_input.value}`);
 
-    Chart.setOptionsProp(`scales=${YscaleName}=ticks=color=${borderColor_Yscales}`);
+            Chart.setOptionsProp(`scales=${yScaleName}=position=${YscalePosSelector.value}`);
 
-    Chart.setOptionsProp(`scales=${YscaleName}=border=color=${borderColor_YScaleline}`);
-    Chart.setOptionsProp(`scales=${YscaleName}=border=width=${YScalelineWidth.value}`);
+            Chart.setOptionsProp(`scales=${yScaleName}=ticks=color=${borderColor_Yscales}`);
 
-    Chart.setOptionsProp(`scales=${YscaleName}=grid=color=${borderColor_YScaleGrid}`);
-    Chart.setOptionsProp(`scales=${YscaleName}=grid=lineWidth=${YScaleGridWidth.value}`);
+            Chart.setOptionsProp(`scales=${yScaleName}=border=color=${borderColor_YScaleline}`);
+            Chart.setOptionsProp(`scales=${yScaleName}=border=width=${YScalelineWidth.value}`);
 
+            Chart.setOptionsProp(`scales=${yScaleName}=grid=color=${borderColor_YScaleGrid}`);
+            Chart.setOptionsProp(`scales=${yScaleName}=grid=lineWidth=${YScaleGridWidth.value}`);
+        }
+    }
+
+    //
     YscaleNameListBuild();
 
-        
-        
     chartContainer.style.backgroundColor=Chart.getOptionsProp('background',0);
-    Chart.chart.update();  
+    Chart.chart.update(); 
+}   
 
-})
+
+//----------кнопка применить
+chartSetOCA.accept.addEventListener("click", ()=>{
+    acceptSettings();
+});
+
+//----------кнопка ок
+chartSetOCA.ok.addEventListener("click", ()=>{
+    acceptSettings();
+    ChartSettingsPopUp.close();
+});
+
+//----------кнопка отмена
+chartSetOCA.cancel.addEventListener("click", ()=>{
+    ChartSettingsPopUp.close();
+});
+

@@ -32,19 +32,21 @@
         <div class="accordion_content" id="meterSettingsWrap"></div>
     </div>
     
-    <!-- панель инструментов графика -->
-    <div class="ChartToolBoard">
-        <button class="ChartToolBoard_button" id="CTBB_Settings">Настройки счетчика</button>
-        <button class="ChartToolBoard_button" id="CTBB_Online">Пауза</button>
-        <button class="ChartToolBoard_button" id="CTBB_TimeRange">Период</button>
-        <button class="ChartToolBoard_button" id="CTBB_SelectTrend">Выбрать тренд</button>
+    <div id="chart_wrapper">
+        <!-- панель инструментов графика -->
+        <div class="ChartToolBoard">
+            <button class="ChartToolBoard_button" id="CTBB_Settings">Настройки счетчика</button>
+            <button class="ChartToolBoard_button" id="CTBB_Online">Пауза</button>
+            <button class="ChartToolBoard_button" id="CTBB_TimeRange">Период</button>
+            <button class="ChartToolBoard_button" id="CTBB_SelectTrend">Выбрать тренд</button>
+        </div>
+
+        <!--график--> 
+        <div id="ChartContainer">
+            <canvas id="Chart" class="Chart"></canvas>
+        </div>
     </div>
-
-     <!--график--> 
-     <div id="ChartContainer">
-        <canvas id="Chart" class="Chart"></canvas>
-     </div>
-
+    
     <!--иконка загрузки--> 
     <div class="loader"></div>
 
@@ -266,7 +268,7 @@
         </div>   
     </div>
 
-    <button class="pop_up_apply">Применить</button>
+    <!-- кнопки ok cancel accept для настроек графика создаются в скрипте-->
 
     <!-- Всплывающее окно выбора периода на графике-->
     <!-- создается с помощью js и все перечисленные ниже элементы также присоединяются-->   
@@ -274,7 +276,7 @@
     <!-- Область выбора диапазона времени во всплывающем окне-->
     <!-- создается с помощью js и присоединяется к созданному выше всплывающему окну-->  
 
-    <button class="pop_up_apply" id="TimeRangeApply">Применить</button>
+    <!-- кнопки ok cancel accept для диапазона времени создаются в скрипте-->   
 
     <!-- Всплывающее окно списка трендов-->
     <!-- создается с помощью js и все перечисленные ниже элементы также присоединяются-->

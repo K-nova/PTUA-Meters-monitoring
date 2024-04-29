@@ -291,6 +291,7 @@ export class ServerDataExchange{
 
                     LenghtRange=(timeRange.secondValue[0]*timeRange.secondValue[1])/1000; 
                     endTime=new Date(startTimeUnix+LenghtRange);
+
                   break;
                 case '2': //начальное/конечное время
                     startTime=timeRange.firstValue;
@@ -680,7 +681,7 @@ export class ChartsCollection{
 
         this.workspace_wrapper=document.querySelector('#workspace_wrapper');
         this.workspace.element=document.querySelector('#Workspace');
-        this.workspace_cover.init();
+        this.workspace_cover=new PageElements.Cover(this.workspace_wrapper);
         this.wsSubheader=document.querySelector('#ws_subheader');
         this.wsSubheaderText=document.querySelector('.subheader_h1');
         this.wsUpButton=document.querySelector('#Subheader-button-up');
@@ -789,27 +790,7 @@ export class ChartsCollection{
     addMeterPopUp;
 
     workspace_wrapper;
-    workspace_cover={
-        body:{},
-        showed:false,
-        init:()=>{
-            this.workspace_cover.body=document.createElement('div');
-            this.workspace_cover.body.className='cover';
-            this.workspace_wrapper.appendChild(this.workspace_cover.body);
-            
-        },
-        show:()=>{
-            let paretnRect= this.workspace_wrapper.getBoundingClientRect();
-            this.workspace_cover.body.style.top=`${paretnRect.top}px`;
-            this.workspace_cover.body.style.display='block';
-            this.workspace_cover.showed=true;
-        },
-
-        hide:()=>{
-            this.workspace_cover.body.style.display='none';
-            this.workspace_cover.showed=false;
-        }
-    };
+    workspace_cover={};
     workspace={element:{}, contentData:{}};
     workspaceContent={};
     overviewTrainingMsg;
@@ -841,8 +822,6 @@ export class ChartsCollection{
 
         //установить функционал кнопки "вверх"
         this.#setWsUpButtonFunc();
-
-        console.log(this.treeData)
 
     }
 
@@ -1156,6 +1135,21 @@ export class ChartsCollection{
                 {target:this.workspaceContent.overviewButtons[0], text:'нажмите на одну из кнопок, чтоб перейти на страницу счетчика или в подпапку'}
                 ]);
 
+            let OTMShowCtrl=()=>{
+                if(this.treeTrainingMsg!=undefined){
+                    if(!this.treeTrainingMsg.trainingFinished){
+                        this.overviewTrainingMsg.hide();
+                    }else{
+                        this.overviewTrainingMsg.show();
+                    }
+                }
+                
+            }
+            
+            this.overviewTrainingMsg.hide();
+    
+            let OTMtimeInterval=setInterval(()=>{OTMShowCtrl()},1000); 
+
         //если папка пуста
         }else{
             let noContentLine=document.createElement('div');
@@ -1412,28 +1406,18 @@ export class ChartsCollection{
             'чтобы открыть контекстное меню где можно удалить/добавить папку'}
         ]);
 
-        let coverCtrl=()=>{
+        let coverShowCtrl=()=>{
             if(!this.treeTrainingMsg.trainingFinished){
                 this.workspace_cover.show();
-
-                if(this.workspaceContent.overview!=undefined){
-                    this.overviewTrainingMsg.hide();
-                }
-                
-
-                let msg_closeButton=this.treeTrainingMsg.messages[this.treeTrainingMsg.msgNum].closeButton;
-                msg_closeButton.addEventListener('click',()=>{
-                    coverCtrl();
-                })
             }else{
                 this.workspace_cover.hide();
-                if(this.workspaceContent.overview!=undefined){
-                    this.overviewTrainingMsg.show();
-                }
             }
         }
+        
+        coverShowCtrl();
 
-        coverCtrl();
+        let TTMtimeInterval=setInterval(()=>{coverShowCtrl()},1000); 
+    
     }
         
 
@@ -1506,16 +1490,16 @@ export class ChartCtrl{
         },
         options:{
             background:[
-                'White',
+                'Ivory',
                 'Honeydew',
                 'Azure',
                 'GhostWhite',
                 'Seashell',
                 'Beige',
-                'Ivory',
                 'AntiqueWhite',
                 'LavenderBlush',
-                'MistyRose'
+                'MistyRose',
+                'White'
             ],
             scales:{
                 x:{
@@ -2372,6 +2356,7 @@ export class ChartCtrl{
                 }
                 //заполняем перемены временного датасета массивами 
                 for(let Point of Trend.Points){
+                    //если к точке подвязан цвет
                     if(Array.isArray(Point)){
                         if (!Array.isArray(TempDataset.backgroundColor)){
                             TempDataset.backgroundColor=[];
@@ -2380,6 +2365,7 @@ export class ChartCtrl{
                         TempDataset.backgroundColor.push(Point[1]);
                         TempDataset.data.push(Point[0]);
                         TempDataset.baseData.push(Point[0]);
+                        //если чистое значение точки
                     }else{
 
                         TempDataset.backgroundColor=this.getDatasetProp(Trend.Name,"backgroundColor",TrendNum);
@@ -2408,41 +2394,42 @@ export class ChartCtrl{
 
     //----------
     rebuildTrends=function(dataFromServer){
+        if(dataFromServer!=ServerDataExchange.NO_CHANGES){
+            this.chart.stop();
 
-        this.chart.stop();
+            //-----если уже существуют
+            if(this.cData.datasets.length>0){
+                //заполняем временную ось
+                let labels=[];  
+                for(let XPoint of dataFromServer.XPoints){
+                    labels.push(new Date(XPoint));
+                }
+                this.cData.baseLabels=Array.from(labels); //дополнительно
+                this.cData.labels=Array.from(labels);
+                // this.cData.baseLabels=Array.from(DataFromServer.XPoints);
+                // this.cData.labels=Array.from(DataFromServer.XPoints);
 
-        //-----если уже существуют
-        if(this.cData.datasets.length>0){
-            //заполняем временную ось
-            let labels=[];  
-            for(let XPoint of dataFromServer.XPoints){
-                labels.push(new Date(XPoint));
-            }
-            this.cData.baseLabels=Array.from(labels); //дополнительно
-            this.cData.labels=Array.from(labels);
-            // this.cData.baseLabels=Array.from(DataFromServer.XPoints);
-            // this.cData.labels=Array.from(DataFromServer.XPoints);
-
-            //тренды
-            for(let dataset of this.cData.datasets){
-                for(let Trend of dataFromServer.Trends){
-                    if(Trend.Name==dataset.Name){
-    
-                        dataset.label=Trend.Label;
-    
-                        //значения
-                        dataset.baseData=Array.from(Trend.Points);
-                        dataset.data=Array.from(Trend.Points);
+                //тренды
+                for(let dataset of this.cData.datasets){
+                    for(let Trend of dataFromServer.Trends){
+                        if(Trend.Name==dataset.Name){
+        
+                            dataset.label=Trend.Label;
+        
+                            //значения
+                            dataset.baseData=Array.from(Trend.Points);
+                            dataset.data=Array.from(Trend.Points);
+                        }
                     }
                 }
             }
+            //-----если не существуют
+            else{
+                this.assembleChartData(dataFromServer);
+            }
+            
+        this.chart.update();
         }
-        //-----если не существуют
-        else{
-            this.assembleChartData(dataFromServer);
-        }
-        
-       this.chart.update();
 
     }
 
@@ -2524,6 +2511,7 @@ export class ChartCtrl{
 //управление сообщениями обучения
 export class TrainingMessages{
     constructor(id,targetOptions){
+        let closedMem=true;
 
         //--создаем первое тренирочные сообщения
         let optionNum=sessionStorage.getItem(locStorName(this.#currMsgMem+id));
@@ -2535,60 +2523,60 @@ export class TrainingMessages{
         
         if(!this.trainingFinished){
             let message=new PageElements.TrainingMessage(targetOptions[this.optionsNum].target,
-                targetOptions[this.optionsNum].text);
+                targetOptions[this.optionsNum].text, targetOptions[this.optionsNum].left);
+            
+            message.wraper.style.zIndex=this.#zIndex;
+
             this.messages.push(message);
 
 
             this.messages[this.msgNum].activate();
+            closedMem=false;
         }
         
 
-        //---создаем последующие трен. сообщения и устанавливаем последовательное их появление с помощью обсервера
-        // Настройки обсервера
-        let mainObsConfig = { attributes: true, attributeFilter:['class'] };
-
-        //функция обсервера
-        let mainObsCallback=(mutations, observer)=>{
-            for(let mutation of mutations){
-                if(mutation.target.className=='trainingMessage' &&
-                 mutation.target==this.messages[this.msgNum].wraper && !this.#hidden){
-
+        //каждую секунду проверяем состояние сообщения и открываем новое, если предыдущее закрыто
+        let timeInterval=setInterval(()=>{
+            if(!this.trainingFinished){
+                if(this.messages[this.msgNum].closed && this.messages[this.msgNum].closed!= closedMem && !this.#hidden){
                     this.optionsNum++;
                     this.msgNum++;
-
+    
                     this.trainingFinished=!(this.optionsNum<=targetOptions.length-1);
-
+    
                     if(!this.trainingFinished){
                         //создаем новое сообщение
                         let message=new PageElements.TrainingMessage(targetOptions[this.optionsNum].target,
-                            targetOptions[this.optionsNum].text);
+                            targetOptions[this.optionsNum].text, targetOptions[this.optionsNum].left);
+                        
+                        message.wraper.style.zIndex=this.#zIndex;
 
                         //добавляем в список
                         this.messages.push(message);
-
-                        //добавляем обсервер к сообщению
-                        observer.observe(this.messages[this.msgNum].wraper, mainObsConfig);
-
+    
                         //активируем видимость
                         this.messages[this.msgNum].activate();
 
                     }
-
+    
                     //записываем в локальную сессию уже пройденные сообщения
                     sessionStorage.setItem(locStorName(this.#currMsgMem+id), this.optionsNum);  
     
+                    
+    
+                }
+
+                if(!this.trainingFinished){
+                    closedMem=this.messages[this.msgNum].closed;
                 }
             }
 
-        }
-
-        //обсервер
-        let mainObserver = new MutationObserver(mainObsCallback);  
-
-        if(!this.trainingFinished){
-            //непосредственный вызов функции сооздания новых сообщений
-            mainObserver.observe(this.messages[this.msgNum].wraper, mainObsConfig);
-        }
+            //отключение периодического опроса, если тренировка пройдена
+            if(this.trainingFinished){
+                clearInterval(timeInterval);
+            }
+           
+        },1000);
         
       
     }
@@ -2601,6 +2589,8 @@ export class TrainingMessages{
     #hidden=false;
 
     #currMsgMem='trainingMsg-optionNum-';
+
+    #zIndex=1;
 
     hide=()=>{
        this.#hidden=true;
@@ -2620,6 +2610,13 @@ export class TrainingMessages{
         }
         
     }
+
+    setZIndex=(value)=>{
+        this.#zIndex=value;
+        for(let msg of this.messages){
+            msg.wraper.style.zIndex=this.#zIndex;
+        }
+    }
 }
 
 //----------
@@ -2627,6 +2624,16 @@ export class TrainingMessages{
 export var PageElements={
    
     PopUp: class{
+        main;
+        container;
+        body;
+        header;
+        closeButton;
+        calllButton;
+
+        displayed=false;
+
+
         constructor(RootParent, calllButton){
             this.calllButton=calllButton;
             //-----создаем элементы
@@ -2662,20 +2669,21 @@ export var PageElements={
             
             //закрывающая кнопка
             this.closeButton.addEventListener("click", ()=>{
-                this.main.classList.remove("active");
-                this.displayed=false;
+                this.close();
             });
 
         }
 
-        main;
-        container;
-        body;
-        header;
-        closeButton;
-        calllButton;
+        open=()=>{
+            this.main.classList.add("active");   
+            this.displayed=true; 
+        }
 
-        displayed=false;
+        close=()=>{
+            this.main.classList.remove("active");
+            this.displayed=false;
+        }
+
     },
 
     CreateTimeRangeSettings: function(RootParent, id='TIA_TimeRange'){
@@ -3025,6 +3033,14 @@ export var PageElements={
     },
 
     AddFolderContent:class{
+        addFolderPopUpWrapper;
+
+        popUpArea;
+        popUpAreaTopic;
+
+        addFolderNameInput;
+        okCancelAccept;
+
         constructor(parent){
             this.addFolderPopUpWrapper=document.createElement('div');
             parent.appendChild(this.addFolderPopUpWrapper);
@@ -3043,39 +3059,13 @@ export var PageElements={
             this.addFolderNameInput.placeholder='Папка1';
             this.popUpArea.appendChild(this.addFolderNameInput);
 
-            this.applyButton=document.createElement('button');
-            this.applyButton.innerText='Ok';
-            this.addFolderPopUpWrapper.appendChild(this.applyButton);
-
+            this.okCancelAccept=new PageElements.OkCancelAccept(this.addFolderPopUpWrapper);
+            this.okCancelAccept.hide('accept');
         }
-        addFolderPopUpWrapper;
-
-        popUpArea;
-        popUpAreaTopic;
-
-        addFolderNameInput;
-        applyButton;
+        
     },
 
     MeterSettingsContent:class{
-        constructor(parent){
-            this.meterSettingsWrapper=document.createElement('div');
-            parent.appendChild(this.meterSettingsWrapper);
-
-            //----
-            this.#createMSArea1();
-
-            //----
-            this.#createMSArea2();
-
-            //----
-            this.#createMSArea3();
-
-            //----
-            this.applyButton=document.createElement('button');
-            this.applyButton.innerText='Применить';
-            this.meterSettingsWrapper.appendChild(this.applyButton);
-        }
 
         meterSettingsWrapper;
 
@@ -3120,7 +3110,8 @@ export var PageElements={
             }
         };
 
-        applyButton;
+        okCancelAccept;
+        
 
         #obisList=[
             '31.7.0',
@@ -3150,6 +3141,24 @@ export var PageElements={
             '53.7.0',
             '73.7.0'
         ]
+
+        constructor(parent){
+            this.meterSettingsWrapper=document.createElement('div');
+            parent.appendChild(this.meterSettingsWrapper);
+
+            //----
+            this.#createMSArea1();
+
+            //----
+            this.#createMSArea2();
+
+            //----
+            this.#createMSArea3();
+
+            //----
+            this.okCancelAccept=new PageElements.OkCancelAccept(this.meterSettingsWrapper);
+            
+        }
 
         #createMSArea1=function(){
             this.mSArea1.body=document.createElement('div');
@@ -3401,8 +3410,21 @@ export var PageElements={
     },
 
     TrainingMessage: class{
-        constructor(target, text){
+        target;
+        wraper;
+        window;
+        arrowWrapper;
+        arrow;
+        header;
+        closeButton;
+        text;
+
+        closed=true;
+        left;
+
+        constructor(target, text, left=false){
             this.target=target;
+            this.left=left;
 
             this.wraper=document.createElement('div');
             this.wraper.className='trainingMessage';
@@ -3410,9 +3432,14 @@ export var PageElements={
 
             this.setPositionByTarget();
 
+            this.arrowWrapper=document.createElement('div');
+            this.arrowWrapper.className='trainingMessageArrowWrapper';
+            this.wraper.appendChild(this.arrowWrapper);
+            if(this.left){ this.arrowWrapper.classList.add('left');}
+
             this.arrow=document.createElement('div');
             this.arrow.className='trainingMessageArrow';
-            this.wraper.appendChild(this.arrow);
+            this.arrowWrapper.appendChild(this.arrow);
 
             this.window=document.createElement('div');
             this.window.className='trainingMessageWindow';
@@ -3447,27 +3474,99 @@ export var PageElements={
             })
 
         }
-        target;
-        wraper;
-        window;
-        arrow;
-        header;
-        closeButton;
-        text;
-
 
         activate=()=>{
             this.wraper.classList.add("active");
+            this.closed=false;
         }
 
         close=()=>{
             this.wraper.classList.remove("active");
+            this.closed=true;
         }
 
         setPositionByTarget=()=>{
             let targetRect=this.target.getBoundingClientRect();//получаем координаты целевого элемента
-            this.wraper.style.left = targetRect.left+this.target.offsetWidth*0.2+ 'px'; // Устанавливаем позицию по горизонтали
-            this.wraper.style.top = targetRect.top+this.target.offsetHeight*0.5 + 'px'; // Устанавливаем позицию по вертикали
+            // Устанавливаем позицию по горизонтали
+            if(!this.left){
+                this.wraper.style.left = targetRect.left+this.target.offsetWidth*0.2+ 'px';     
+            }else{
+                this.wraper.style.left = targetRect.left-this.wraper.offsetWidth+this.target.offsetWidth*0.3+ 'px'; 
+            }
+            // Устанавливаем позицию по вертикали
+            this.wraper.style.top = targetRect.top+this.target.offsetHeight*0.5 + 'px'; 
+            
+        }
+
+    },
+
+    Cover:class{
+        constructor(parent){
+            this.parent=parent;
+
+            this.body=document.createElement('div');
+            this.body.className='cover';
+            this.parent.appendChild(this.body);
+        }
+        parent={};
+        body={};
+
+        showed=false;
+        
+        show=()=>{
+            let paretnRect= this.parent.getBoundingClientRect();
+            this.body.style.top=`${paretnRect.top}px`;
+            this.body.style.display='block';
+            this.showed=true;
+        };
+
+        hide=()=>{
+            this.body.style.display='none';
+            this.showed=false;
+        }
+    },
+
+    OkCancelAccept:class{
+        parent;
+        wrapper;
+        accept;
+        ok;
+        cancel
+
+        constructor(parent){
+            this.parent=parent
+
+            this.wrapper=document.createElement('div');
+            this.wrapper.className='okCancelAccept';
+            this.parent.appendChild(this.wrapper);
+
+            this.accept=document.createElement('button');
+            this.accept.className='okCancelAccept_button';
+            this.accept.innerText='Применить';
+            this.wrapper.appendChild(this.accept);
+
+            this.cancel=document.createElement('button');
+            this.cancel.className='okCancelAccept_button';
+            this.cancel.innerText='Отмена';
+            this.wrapper.appendChild(this.cancel);
+
+            this.ok=document.createElement('button');
+            this.ok.className='okCancelAccept_button';
+            this.ok.innerText='OK';
+            this.wrapper.appendChild(this.ok);
+
+        }
+
+        hide=(buttonName='ok')=>{
+            try{
+                this[buttonName].style.display='none';
+            }catch(err){console.log(err)}
+        }
+
+        show=(buttonName='ok')=>{
+            try{
+                this[buttonName].style.display='block';
+            }catch(err){console.log(err)}
         }
     }
 

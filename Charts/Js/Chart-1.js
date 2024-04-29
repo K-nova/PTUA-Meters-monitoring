@@ -6,6 +6,10 @@ import {PageElements, ChartCtrl, TrainingMessages, locStorName,
 //console.log(forChartPage)
 
 //------диаграмма
+//блокирующий фон для тренировочных сообщений
+let chartCover=new PageElements.Cover(document.querySelector('#chart_wrapper'));
+let chartCover_zIndex=window.getComputedStyle(chartCover.body).zIndex;
+
 //общие данные для страницы диаграммы
 let forChartPageData=JSON.parse(sessionStorage.getItem(locStorName(ChartsCollection.FOR_CHART_PAGE_STORAGENAME)));
 //Определяем тип диаграммы
@@ -88,8 +92,8 @@ for(let checkBoxLine of MeterSetting.mSArea3.subArea1.column2.cbLinesContent){
 MeterSetting.mSArea3.subArea2.column1.input_metter_timeValue.value=meterSettingsData.exchangeTimeValue;
 MeterSetting.mSArea3.subArea2.column3.select.value=meterSettingsData.exchangeTimeType;
 
-//кнопка применить
-MeterSetting.applyButton.addEventListener('click',()=>{
+//функция применить
+let meterSettingApply=()=>{
     //формируем данные настройки счетчика
     let setMeterData={text:{}, meterSettings:{}};
     //общее
@@ -130,7 +134,6 @@ MeterSetting.applyButton.addEventListener('click',()=>{
     setMeterData.meterSettings.exchangeTimeValue=MeterSetting.mSArea3.subArea2.column1.input_metter_timeValue.value;
     setMeterData.meterSettings.exchangeTimeType=MeterSetting.mSArea3.subArea2.column3.select.value;
 
-
     //команда изменения данных счетчика на сервере
     
     let setMeterResponse=ServerDataExchange.setMeterSettings({
@@ -147,18 +150,26 @@ MeterSetting.applyButton.addEventListener('click',()=>{
 
         }
     }
-})
+}
+
+//кнопки ок/отмена/применить
+MeterSetting.okCancelAccept.accept.addEventListener('click',()=>{
+    meterSettingApply();
+});
+MeterSetting.okCancelAccept.hide('ok');
+MeterSetting.okCancelAccept.hide('cancel');
 
 //training messages
 let meterSettings_checkbox=document.querySelector('#meterSettings_checkbox');
-let meterSettingsHidden=true;
 
 let TrainingMessagesMS=new TrainingMessages('meterSettings',[
     {target:MeterSetting.mSArea3.subArea1.column1.cbList.checkBoxes[0], text:'установите, или отмените опрос счетчика. При выключенном опросе значения будут равнятся нулю'},
     {target:MeterSetting.mSArea3.subArea2.column1.input_metter_timeValue, text:'данные настройки позволяют изменить период опроса счетчика'},
-    {target:MeterSetting.applyButton, text:'чтобы изменения вступили в силу нажмите "Применить"'},
+    {target:MeterSetting.okCancelAccept.accept, text:'чтобы изменения вступили в силу нажмите "Применить"', left:true},
+    {target:document.querySelector('#meterSettings .accordion_label'), text:'нажмите, чтоб скрыть меню настройки текущего счетчика'},
     ]);
 
+TrainingMessagesMS.setZIndex(chartCover_zIndex+1);
 
 TrainingMessagesMS.hide();
 
@@ -167,16 +178,22 @@ let TMMSinterval=setInterval(()=>{
     
     if(cover.style.display=='block'){TrainingMessagesMS.hide();}
     else{
-        TrainingMessagesMS.show();
+        if(TrainingMessagesC!=undefined && TrainingMessagesC.optionsNum>=1 && meterSettings_checkbox.checked){
+            TrainingMessagesMS.show();
+        }else{
+            TrainingMessagesMS.hide();
+        }
+        
+    }
+
+    //отключение периодического опроса, если тренировка пройдена
+    if(TrainingMessagesMS.trainingFinished){
+        clearInterval(TMMSinterval);
     }
 
 },1000);
     
-meterSettings_checkbox.addEventListener('click',()=>{
-    meterSettingsHidden=!meterSettingsHidden;
-    if(!meterSettingsHidden){TrainingMessagesMS.show();}
-    else{TrainingMessagesMS.hide();}
-})    
+   
 
 //------------Pop-up Списка трендов счетчика
 let CTBB_SelectTrend=document.querySelector("#CTBB_SelectTrend");
@@ -210,7 +227,7 @@ for(let dataset of Chart.cData.datasets){
 //------------Pop-up настроек
 let OpenSettingsPopUp=document.querySelector("#CTBB_Settings");
 //создаем Pop-up
-let ChartSettingsPopUp=new PageElements.PopUp(document.body, OpenSettingsPopUp);
+export let ChartSettingsPopUp=new PageElements.PopUp(document.body, OpenSettingsPopUp);
 
 
 //---------Pop-up tabs
@@ -247,9 +264,9 @@ for(let TabItem of CStabItems){
     ChartSettingsPopUp.body.appendChild(TabItem);
 }
 
-//присоединяем кнопку применить
-export let PopUpApply=document.querySelector(".pop_up_apply");
-ChartSettingsPopUp.body.appendChild(PopUpApply);
+//присоединяем кнопки ок/отмена/применить
+export let chartSetOCA=new PageElements.OkCancelAccept(ChartSettingsPopUp.body);
+
 
 //активируем первую вкладку
 tabs[0].click();
@@ -257,7 +274,7 @@ tabs[0].click();
 //training messages
 let TrainingMessagesTS=new TrainingMessages('trendSettings',[
     {target:tabs[0], text:'Чтобы переключатся между группами настройки нажимайте соответствующие вкладки'},
-    {target:PopUpApply, text:'Чтобы изменения вступили в силу нажмите данную кнопку. <br>Важно! Изменения применятся со всех вкладок'},
+    {target:chartSetOCA.ok, text:'Чтобы изменения вступили в силу нажмите данную кнопку. <br>Важно! Изменения применятся со всех вкладок'},
     ]);
 
 TrainingMessagesTS.hide();
@@ -270,6 +287,11 @@ let TMTSinterval=setInterval(()=>{
             TrainingMessagesTS.show();
         }
         
+    }
+
+    //отключение периодического опроса, если тренировка пройдена
+    if(TrainingMessagesTS.trainingFinished){
+        clearInterval(TMTSinterval);
     }
 
 },1000);
@@ -289,9 +311,16 @@ ChartSettingsPopUp.closeButton.addEventListener('click',()=>{
     CSPopUpCtrlVisibility();
 })
 
-PopUpApply.addEventListener('click',()=>{
+chartSetOCA.ok.addEventListener('click',()=>{
     CSPopUpCtrlVisibility();
 })
+chartSetOCA.accept.addEventListener('click',()=>{
+    CSPopUpCtrlVisibility();
+})
+chartSetOCA.cancel.addEventListener('click',()=>{
+    CSPopUpCtrlVisibility();
+})
+
 
 //----------онлайн/офлайн контроль
 let CTBB_Online=document.querySelector('#CTBB_Online');
@@ -344,14 +373,13 @@ let TimeRangeArea=PageElements.CreateTimeRangeSettings(ChartTimeRangePopUp.body,
 //блокируем функционал
 TimeRangeArea.TimeRangeSelectorOptions[2].disabled=true;
 
-//присоединяем кнопку применить
-let TimeRangeApply=document.querySelector("#TimeRangeApply");
-ChartTimeRangePopUp.body.appendChild(TimeRangeApply);
+//присоединяем кнопки ок/отмена/применить
+let tRangeSetOCA=new PageElements.OkCancelAccept(ChartTimeRangePopUp.body);
 
-//кнопка применить
-TimeRangeApply.addEventListener('click',()=>{
+//функция применить
+let timeRangeAccept=()=>{
     let DFSsecondValue;
-    let DFSFirstVal=TimeRangeArea.startTimeInput.value;
+    let DFSFirstVal=DateTime.StringToDCS(TimeRangeArea.startTimeInput.value);
     let DFSType=TimeRangeArea.timeRangeSelector.value;
 
     switch(DFSType){
@@ -364,8 +392,18 @@ TimeRangeApply.addEventListener('click',()=>{
     }
 
     loadDataToChart(DFSType,DFSFirstVal,DFSsecondValue);
-
-})
+}
+//кнопки ок/отмена/применить
+tRangeSetOCA.accept.addEventListener('click',()=>{
+    timeRangeAccept();
+});
+tRangeSetOCA.ok.addEventListener('click',()=>{
+    timeRangeAccept();
+    ChartTimeRangePopUp.close();
+});
+tRangeSetOCA.cancel.addEventListener('click',()=>{
+    ChartTimeRangePopUp.close();
+});
 
 //------------training messages
 let TrainingMessagesC=new TrainingMessages('chart',[
@@ -376,16 +414,38 @@ let TrainingMessagesC=new TrainingMessages('chart',[
     {target:OpenSettingsPopUp, text: 'нажмите, чтобы настроить общий вид графика<br>фон, цвета трендов, оси и пр.'},
     ]);
 
+    TrainingMessagesC.hide();
+
+    if(!TrainingMessagesC.trainingFinished){chartCover.show();}
+    else{chartCover.hide()}
+    
+    
+
     let TMCinterval=setInterval(()=>{
     
+        //контроль показывания тренировочных сообщений и блокирующего фона
         if(cover.style.display=='block'){TrainingMessagesC.hide();}
         else{
-            if(TrainingMessagesMS.trainingFinished){
+            if(TrainingMessagesC.optionsNum==0 || 
+                (TrainingMessagesC.optionsNum>=1 &&  TrainingMessagesMS.trainingFinished)){
+                    
                 TrainingMessagesC.show();
+                if(TrainingMessagesC.optionsNum>=1){chartCover.hide();}            
+            }else{
+                TrainingMessagesC.hide();
+                chartCover.show();
             }
             
         }
-    
+
+        //контроль z положения тренировочных сообщений
+        if(TrainingMessagesC.optionsNum==0){TrainingMessagesC.setZIndex(chartCover_zIndex+1);}
+        else{TrainingMessagesC.setZIndex(1);}
+        
+        //отключение периодического опроса, если тренировка пройдена
+        if(TrainingMessagesC.trainingFinished && !chartCover.showed){
+            clearInterval(TMCinterval);
+        }
     },1000);
 
 

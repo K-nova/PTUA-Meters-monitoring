@@ -102,9 +102,9 @@ h4{
   width: 100%;
   height: 100%;
 
-  background-color: rgba(0, 0, 0, 0.2); /* Прозрачный цвет */
+  background-color: rgba(0, 0, 0, 0.5); /* Прозрачный цвет */
 
-  z-index: 999; /* Выше элемента ввода */
+  z-index: 99; /* Выше элемента ввода */
 }
 
 /*--------контекстное меню мыши--------*/
@@ -285,6 +285,18 @@ h4{
   display: flex;
   margin: 0;
 }
+
+/*--------okCancelAccept--------*/
+.okCancelAccept{
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.okCancelAccept_button{
+  margin-right: .25em;
+  margin-left: .25em;
+}
+
 /*--------trainingMessage--------*/
 .trainingMessage{
   display: block;
@@ -300,6 +312,15 @@ h4{
 
 .trainingMessage.active{
   transform:  translateY(0%) scale(100%);
+}
+
+.trainingMessageArrowWrapper{
+  display: flex;
+  justify-content: flex-start;
+}
+
+.trainingMessageArrowWrapper.left{
+  justify-content: flex-end;
 }
 
 .trainingMessageArrow{

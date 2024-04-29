@@ -44,25 +44,48 @@ let AddFolder1Content=new PageElements.AddFolderContent(ChartColl.addFolderPopUp
 let AddFolder2Content=new PageElements.AddFolderContent(ChartColl.addFolder2PopUp.body);
 
 //присваиваем функционал
-let addFolderPopUpLogic=function(content){
-    content.applyButton.addEventListener('click',()=>{
+let addFolderPopUpLogic=function(content, popUp){
+    let acceptDone=false;
+    //функция применить
+    let meterSettingApply=()=>{
         //команда добавляения данных счетчика на сервер
-        ServerDataExchange.addItem({
+        let addFolderResponse=ServerDataExchange.addItem({
             idPath:ChartColl.mouseFTreeMenuEventPath.idPath,
             text:content.addFolderNameInput.value || content.addFolderNameInput.placeholder,
             type: 'folder'
         });
 
-        //пересобираем дерево и воркспейс
-        ChartColl.construct();
+        if(!addFolderResponse.err){
+            //пересобираем дерево и воркспейс
+            ChartColl.construct();
 
-        //закрываем окно
-        ChartColl.addFolderPopUp.closeButton.click();
+            acceptDone=true;
+        }else{
+            if(addFolderResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
+                alert('Такая папка уже существует!');          
+    
+            }
+            acceptDone=false;
+        }
+
+
+    }
+
+    //кнопки ок/отмена/применить
+    content.okCancelAccept.ok.addEventListener('click',()=>{
+        acceptDone=false;
+        meterSettingApply();
+        if(acceptDone){popUp.close();}
     })
+
+    content.okCancelAccept.cancel.addEventListener('click',()=>{
+        popUp.close();
+    })
+
 }
 
-addFolderPopUpLogic(AddFolder1Content);
-addFolderPopUpLogic(AddFolder2Content);
+addFolderPopUpLogic(AddFolder1Content, ChartColl.addFolderPopUp);
+addFolderPopUpLogic(AddFolder2Content, ChartColl.addFolder2PopUp);
 
 
 //------------Pop-up добавления счетчика
@@ -76,9 +99,8 @@ ChartColl.addMeterPopUp.calllButton.addEventListener("click", ()=>{
     MeterSettingsContent.mSArea1.input_meter_path.value=ChartColl.mouseFTreeMenuEventPath.textPath;
 })
 
-//кнопка применить
-MeterSettingsContent.applyButton.addEventListener('click',()=>{
-
+//функция применить
+let meterSettingApply=()=>{
     //формируем данные настройки счетчика
     let meterSettings={};
     meterSettings.ip=[];
@@ -116,7 +138,6 @@ MeterSettingsContent.applyButton.addEventListener('click',()=>{
     meterSettings.exchangeTimeValue=MeterSettingsContent.mSArea3.subArea2.column1.input_metter_timeValue.value;
     meterSettings.exchangeTimeType=MeterSettingsContent.mSArea3.subArea2.column3.select.value;
 
-
     //команда добавляения данных счетчика на сервер
     
     let addMeterResponse=ServerDataExchange.addItem({
@@ -136,10 +157,20 @@ MeterSettingsContent.applyButton.addEventListener('click',()=>{
 
         }
     }
-    
+}
 
+//кнопки ок/отмена/применить
+MeterSettingsContent.okCancelAccept.accept.addEventListener('click',()=>{
+    meterSettingApply();
+});
+MeterSettingsContent.okCancelAccept.ok.addEventListener('click',()=>{
+    meterSettingApply();
+    ChartColl.addMeterPopUp.close();
+});
+MeterSettingsContent.okCancelAccept.cancel.addEventListener('click',()=>{
+    ChartColl.addMeterPopUp.close();
+});
 
-})
 
 
 

@@ -7,7 +7,7 @@ let Yscales=Chart.getYscales();
 
 let YscaleListArea=document.querySelector("#YscaleListCBArea");
 
-let YscaleList=PageElements.CreateCheckBoxList(YscaleListArea,'YscaleListCBs',Yscales.length);
+export let YscaleList=PageElements.CreateCheckBoxList(YscaleListArea,'YscaleListCBs',Yscales.length);
 
 //добавляем данные в чек-бокс лист
 
@@ -26,7 +26,7 @@ YscaleNameListBuild();
 
 //
 
-export let YscaleName=YscaleList.checkBoxes[0].value;
+let YscaleName=YscaleList.checkBoxes[0].value;
 
 //экспортируем элемент
 export let YscaleCBArr=YscaleList.checkBoxes;
