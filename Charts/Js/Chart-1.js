@@ -55,7 +55,18 @@ let DFSType=2//мин макс время;
 loadDataToChart(DFSType,DFSstartVal,DFSecondVal);
 
 //------------настройки счетчика
+//изменение родительского экрана
+let meterSettings_checkbox=document.querySelector('#meterSettings_checkbox');
+let workspace_iframe=window.parent.document.querySelector('.workspace-iframe');
+meterSettings_checkbox.addEventListener('click',()=>{
+    if(meterSettings_checkbox.checked){
+        workspace_iframe.style.minHeight=workspace_iframe.offsetHeight+500+'px';
+    }else{
+        workspace_iframe.style.minHeight=workspace_iframe.offsetHeight-500+'px';
+    }
+})
 
+//
 let meterSettingsWrap=document.querySelector('#meterSettingsWrap');
 let MeterSetting=new PageElements.MeterSettingsContent(meterSettingsWrap);
 let meterSettingsData=ServerDataExchange.getMeterSettings(forChartPageData.idPath);
@@ -161,7 +172,6 @@ MeterSetting.okCancelAccept.hide('cancel');
 
 //training messages
 let meterSettingsALabel=document.querySelector('#meterSettingsALabel');
-let meterSettings_checkbox=document.querySelector('#meterSettings_checkbox');
 
 let TrainingMessagesMS=new TrainingMessages('meterSettings',[
     {target:MeterSetting.mSArea3.subArea1.column1.cbList.checkBoxes[0], text:'установите, или отмените опрос счетчика. При выключенном опросе значения будут равнятся нулю'},
