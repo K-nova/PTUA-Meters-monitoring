@@ -138,6 +138,9 @@ TrendListArea.addEventListener('click',()=>{
 //---------элемент толщины линии графика
 export let LineWidthInput=document.querySelector("#input_line_width");
 LineWidthInput.value=Chart.getDatasetProp(Name,"borderWidth");
+const LINE_WIDTH_MIN_VAL=0.5;
+PageElements.setInputMinMax(LineWidthInput, LINE_WIDTH_MIN_VAL, 30);
+
 //изменен тренд
 TrendListArea.addEventListener('click',()=>{
     LineWidthInput.value=Chart.getDatasetProp(Name,"borderWidth");

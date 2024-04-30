@@ -150,6 +150,8 @@ export let YScalelineWidth=document.querySelector("#YScalelineWidth");
 
 YScalelineWidth.value=Chart.getOptionsProp(`scales=${YscaleName}=border=width`);
 
+PageElements.setInputMinMax(YScalelineWidth, 0.5, 30);
+
 YscaleListArea.addEventListener('click',()=>{
     YScalelineWidth.value=Chart.getOptionsProp(`scales=${YscaleName}=border=width`);
 })
@@ -204,6 +206,8 @@ pickr_YScaleGrid.on('save', (color) => {
 export let YScaleGridWidth=document.querySelector("#YScalelineGrid");
 
 YScaleGridWidth.value=Chart.getOptionsProp(`scales=${YscaleName}=grid=lineWidth`);
+
+PageElements.setInputMinMax(YScaleGridWidth, 0.5, 30);
 
 YscaleListArea.addEventListener('click',()=>{
     YScaleGridWidth.value=Chart.getOptionsProp(`scales=${YscaleName}=grid=lineWidth`);

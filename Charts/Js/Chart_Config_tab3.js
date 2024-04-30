@@ -14,8 +14,8 @@ confTimeRangeArea.TimeRangeSelectorOptions[2].disabled=true;
 confTimeRangeArea.timeRangeSelector.value=Chart.getOptionsProp("scales=x=timeRangeSelector");
 
 //текущие пределы
-confTimeRangeArea.startTime_ADP.selectDate(Chart.getMinTime());
-confTimeRangeArea.endTime_ADP.selectDate(Chart.getMaxTime());
+// confTimeRangeArea.startTime_ADP.selectDate(Chart.getMinTime());
+// confTimeRangeArea.endTime_ADP.selectDate(Chart.getMaxTime());
 confTimeRangeArea.timeRangeInput.value= Chart.getOptionsProp("scales=x=timeRangeInput"); 
 confTimeRangeArea.timeRangeItemSelect.value= Chart.getOptionsProp("scales=x=timeRangeItemSelect"); 
 
@@ -66,6 +66,7 @@ pickr_XScaleline.on('save', (color) => {
 //---------элемент толщины линии оси
 export let XScalelineWidth=document.querySelector("#XScalelineWidth");
 XScalelineWidth.value=Chart.getOptionsProp("scales=x=border=width");
+PageElements.setInputMinMax(XScalelineWidth, 0.5, 30);
 
 //---------элемент цвета сетки
 const pickr_XScaleGrid = Pickr.create({
@@ -110,6 +111,7 @@ pickr_XScaleGrid.on('save', (color) => {
 //---------элемент толщины линии сетки
 export let XScaleGridWidth=document.querySelector("#XScalelineGrid");
 XScaleGridWidth.value=Chart.getOptionsProp("scales=x=grid=lineWidth");
+PageElements.setInputMinMax(XScaleGridWidth, 0.5, 30);
 
 //---------элемент цвета меток
 

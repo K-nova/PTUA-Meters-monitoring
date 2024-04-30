@@ -1137,7 +1137,7 @@ export class ChartsCollection{
 
             let OTMShowCtrl=()=>{
                 if(this.treeTrainingMsg!=undefined){
-                    if(!this.treeTrainingMsg.trainingFinished){
+                    if(this.workspaceContent.overview==undefined || !this.treeTrainingMsg.trainingFinished){
                         this.overviewTrainingMsg.hide();
                     }else{
                         this.overviewTrainingMsg.show();
@@ -2523,7 +2523,8 @@ export class TrainingMessages{
         
         if(!this.trainingFinished){
             let message=new PageElements.TrainingMessage(targetOptions[this.optionsNum].target,
-                targetOptions[this.optionsNum].text, targetOptions[this.optionsNum].left);
+                targetOptions[this.optionsNum].text, targetOptions[this.optionsNum].left, 
+                targetOptions[this.optionsNum].disableCloseButton);
             
             message.wraper.style.zIndex=this.#zIndex;
 
@@ -2547,7 +2548,8 @@ export class TrainingMessages{
                     if(!this.trainingFinished){
                         //создаем новое сообщение
                         let message=new PageElements.TrainingMessage(targetOptions[this.optionsNum].target,
-                            targetOptions[this.optionsNum].text, targetOptions[this.optionsNum].left);
+                            targetOptions[this.optionsNum].text, targetOptions[this.optionsNum].left,
+                            targetOptions[this.optionsNum].disableCloseButton);
                         
                         message.wraper.style.zIndex=this.#zIndex;
 
@@ -2727,6 +2729,7 @@ export var PageElements={
          let startTimeInput=document.createElement('input');
          startTimeInput.className='input';
          startTimeInput.type="datetime";
+         startTimeInput.setAttribute("readonly", "readonly");
          let startTimeID=id+'_StartTime';
          startTimeInput.id=startTimeID;
          tab_item_area.appendChild(startTimeInput);
@@ -2740,6 +2743,7 @@ export var PageElements={
          endTimeInput.className='input';
          if(timeRangeSelector.value!='2'){endTimeInput.classList.add('notAllowed');}
          endTimeInput.type="datetime";
+         endTimeInput.setAttribute("readonly", "readonly");
          let endTimeID=id+'_EndTime';
          endTimeInput.id=endTimeID;
          tab_item_area.appendChild(endTimeInput);
@@ -2764,9 +2768,11 @@ export var PageElements={
                  buttons: ['today'],
                   //устанавливаем ограничения в датапикере
                  onSelect({date}){
-                     endTime_ADP.update({minDate:date})
+                    if(date!=undefined && timeRangeSelector.value=='2'){
+                        endTime_ADP.update({minDate:date});
+                    }
                  }
-             });
+             });  
          
          endTime_ADP=new AirDatepicker(`#${endTimeID}`, {
              selectedDates: [new Date()],
@@ -2785,9 +2791,12 @@ export var PageElements={
              buttons: ['today'],
              //устанавливаем ограничения в датапикере
              onSelect({date}){
-                 startTime_ADP.update({maxDate:date})
+                if(date!=undefined  && timeRangeSelector.value=='2'){
+                    startTime_ADP.update({maxDate:date});
+                }
              }
          }); 
+         
 
          //диапазон времени
          let h4_4=document.createElement('h4');
@@ -2807,6 +2816,7 @@ export var PageElements={
          timeRangeInput.type="number";
          timeRangeInput.min='1';
          timeRangeInput.value='1';
+         PageElements.onlyDigitsKey(timeRangeInput);
          tab_item_area_sub_column_1.appendChild(timeRangeInput);
 
          let tab_item_area_sub_column_2=document.createElement('div');
@@ -3019,18 +3029,38 @@ export var PageElements={
     setInputMinMax(input, min, max){
         input.min=`${min}`;
         input.max=`${max}`;
-        input.addEventListener("input", function() {
-            let max = parseInt(this.getAttribute("max"));
-                if (this.value > max) {
-                    this.value = max;
-                }
+        input.addEventListener("input", ()=> {
+            if (input.value > max) {
+                input.value = max;
+            }
         
-                let min = parseInt(this.getAttribute("min"));
-                if (this.value < min) {
-                    this.value = min;
-                }
+            if (input.value < min) {
+                input.value = min;
+            }
+
+            if(input.value==''){
+                input.value = min;
+            }
+
         })
     },
+
+    onlyDigitsKey(target){
+        target.addEventListener("keydown", function(event) {
+            // Получаем код клавиши
+            let key = event.keyCode || event.which;
+        
+            // Разрешаем ввод только цифр и клавиш Backspace, Delete, Tab и стрелок
+            if ((key < 48 || key > 57) &&
+             key !== 8 && key !== 46 && key !== 9 && 
+             (key < 37 || key > 40) &&
+            (key<96|| key>105)) {
+                event.preventDefault();
+            }
+        });
+        
+    },
+    
 
     AddFolderContent:class{
         addFolderPopUpWrapper;
@@ -3211,6 +3241,7 @@ export var PageElements={
                 this.mSArea2.input_ip[i].type='number';
                 this.mSArea2.body.appendChild(this.mSArea2.input_ip[i]);
                 PageElements.setInputMinMax(this.mSArea2.input_ip[i],0,255);
+                PageElements.onlyDigitsKey(this.mSArea2.input_ip[i]);
                 this.mSArea2.input_ip[i].value='0';
             }
 
@@ -3241,6 +3272,7 @@ export var PageElements={
             this.mSArea2.input_rs_port.value=0;
             this.mSArea2.body.appendChild(this.mSArea2.input_rs_port);
             PageElements.setInputMinMax(this.mSArea2.input_rs_port,0,255);
+            PageElements.onlyDigitsKey(this.mSArea2.input_rs_port);
 
             this.mSArea2.label_rs485_adress=document.createElement('h4');
             this.mSArea2.label_rs485_adress.innerText='адрес счетчика в последовательном интерфейсе';
@@ -3252,6 +3284,7 @@ export var PageElements={
             this.mSArea2.input_rs485_adress.value=1;
             this.mSArea2.body.appendChild(this.mSArea2.input_rs485_adress);
             PageElements.setInputMinMax(this.mSArea2.input_rs485_adress,0,128);
+            PageElements.onlyDigitsKey(this.mSArea2.input_rs485_adress);
 
             //логика
             this.mSArea2.select_rs_type.addEventListener("change", ()=> {            
@@ -3358,6 +3391,7 @@ export var PageElements={
             this.mSArea3.subArea2.column1.input_metter_timeValue.min=0;
             this.mSArea3.subArea2.column1.input_metter_timeValue.value=1;
             this.mSArea3.subArea2.body.appendChild(this.mSArea3.subArea2.column1.input_metter_timeValue);
+            PageElements.onlyDigitsKey(this.mSArea3.subArea2.column1.input_metter_timeValue);
 
             this.mSArea3.subArea2.column2.body=document.createElement('div');
             this.mSArea3.subArea2.column2.body.className='tab_item_area_sub_column';
@@ -3422,7 +3456,7 @@ export var PageElements={
         closed=true;
         left;
 
-        constructor(target, text, left=false){
+        constructor(target, text, left=false, disableCloseButton=false){
             this.target=target;
             this.left=left;
 
@@ -3450,8 +3484,9 @@ export var PageElements={
             this.window.appendChild(this.header);
 
             this.closeButton=document.createElement('button');
-            this.closeButton.className="trainingMessageHeader_close";
+            //this.closeButton.className="trainingMessageHeader_close";
             this.closeButton.innerText="✖"; //&#10006
+            if(disableCloseButton){this.closeButton.classList.add('notAllowed');}
             this.header.appendChild(this.closeButton);
 
             this.text=document.createElement('div');

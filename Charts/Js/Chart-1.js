@@ -160,13 +160,14 @@ MeterSetting.okCancelAccept.hide('ok');
 MeterSetting.okCancelAccept.hide('cancel');
 
 //training messages
+let meterSettingsALabel=document.querySelector('#meterSettingsALabel');
 let meterSettings_checkbox=document.querySelector('#meterSettings_checkbox');
 
 let TrainingMessagesMS=new TrainingMessages('meterSettings',[
     {target:MeterSetting.mSArea3.subArea1.column1.cbList.checkBoxes[0], text:'установите, или отмените опрос счетчика. При выключенном опросе значения будут равнятся нулю'},
     {target:MeterSetting.mSArea3.subArea2.column1.input_metter_timeValue, text:'данные настройки позволяют изменить период опроса счетчика'},
     {target:MeterSetting.okCancelAccept.accept, text:'чтобы изменения вступили в силу нажмите "Применить"', left:true},
-    {target:document.querySelector('#meterSettings .accordion_label'), text:'нажмите, чтоб скрыть меню настройки текущего счетчика'},
+    {target:document.querySelector('#meterSettings .accordion_label'), text:'нажмите, чтоб скрыть меню настройки текущего счетчика' ,disableCloseButton:true},
     ]);
 
 TrainingMessagesMS.setZIndex(chartCover_zIndex+1);
@@ -175,7 +176,8 @@ TrainingMessagesMS.hide();
 
 let cover=window.parent.document.querySelector('.cover');
 let TMMSinterval=setInterval(()=>{
-    
+
+    //показывать или скрывать тренировочные сообщения
     if(cover.style.display=='block'){TrainingMessagesMS.hide();}
     else{
         if(TrainingMessagesC!=undefined && TrainingMessagesC.optionsNum>=1 && meterSettings_checkbox.checked){
@@ -185,6 +187,11 @@ let TMMSinterval=setInterval(()=>{
         }
         
     }
+
+    //подсвечивать кнопку раскрытия настроек счетчика, если тренировка не пройдена
+    if(!meterSettings_checkbox.checked && !TrainingMessagesMS.trainingFinished){
+        meterSettingsALabel.classList.add('blinking');
+    }else{meterSettingsALabel.classList.remove('blinking');}
 
     //отключение периодического опроса, если тренировка пройдена
     if(TrainingMessagesMS.trainingFinished){
@@ -407,7 +414,7 @@ tRangeSetOCA.cancel.addEventListener('click',()=>{
 
 //------------training messages
 let TrainingMessagesC=new TrainingMessages('chart',[
-    {target:document.querySelector('#meterSettings'), text:'нажмите, чтоб раскрыть меню настройки текущего счетчика'},
+    {target:document.querySelector('#meterSettings'), text:'нажмите, чтоб раскрыть меню настройки текущего счетчика',disableCloseButton:true},
     {target:CTBB_Online, text:'нажмите, чтоб включить/выключить автопрокрутку графика при появлении новых данных'},
     {target:document.getElementById('Chart'), text: 'колесом мыши возможно изменение масштаба'},
     {target:document.getElementById('Chart'), text: 'движение мыши с ее зажатой кнопкой позволяет перемещатся вдоль осей'},

@@ -11,6 +11,16 @@
 }
 
 /*--------базовые стили основных элементов--------*/
+html, body{
+  height: 100%;
+  overflow: hidden;
+}
+
+object{
+  height: 100%;
+  overflow: hidden !important;
+}
+
 button{
   background-color:var(--BackColor);
   color:#ffffff;
@@ -257,6 +267,12 @@ h4{
   top: 20%;
 }
 
+@media screen and (max-height: 500px){
+  .pop_up_container{
+    top:5%;
+  }
+}
+
 .pop_up_container{
   margin: auto;
   width: fit-content;
@@ -374,7 +390,17 @@ h4{
   cursor: pointer;
 }
 
-.accordion_label:hover{
+.accordion_label.blinking{
+  animation: accordion_blink 1s infinite;
+}
+
+@keyframes accordion_blink {
+0% { background-color: var(--BackColor); }
+50% { background-color: var(--ActivationColor); }
+100% { background-color: var(--BackColor); }
+}
+
+.accordion_label:hover, .accordion_label.blinking:hover{
   background-color:var(--ActivationColor);
   transition: background (--transition-duration) ease-out;
 }
