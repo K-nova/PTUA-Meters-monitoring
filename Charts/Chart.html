@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0" >
     <title>Chart</title>
     <!--подключение файла стилей--> 
     <link rel="stylesheet" type="text/css" href="../Main/css/Style.css"> 
@@ -24,262 +24,265 @@
 </head>
 
 <body>
-    <!--настройки счетчика. Смотри скрипт-->
-    <div class="accordion_item" id="meterSettings">        
-        <label for="meterSettings_checkbox" class="accordion_label" id="meterSettingsALabel">Настройки счетчика</label>
-        <input  type="checkbox" class="accordion_ctrlElement" id="meterSettings_checkbox">
-        <div class="accordion_expandIcon"></div>
-        <div class="accordion_content" id="meterSettingsWrap"></div>
-    </div>
-    
-    <div id="chart_wrapper">
-        <!-- панель инструментов графика -->
-        <div class="ChartToolBoard">
-            <button class="ChartToolBoard_button" id="CTBB_Settings">Настройки графика</button>
-            <button class="ChartToolBoard_button" id="CTBB_Online">Пауза</button>
-            <button class="ChartToolBoard_button" id="CTBB_TimeRange">Период</button>
-            <button class="ChartToolBoard_button" id="CTBB_SelectTrend">Выбрать тренд</button>
+    <div class="" id="bodyWrapper">
+         <!--настройки счетчика. Смотри скрипт-->
+        <div class="accordion_item" id="meterSettings">        
+            <label for="meterSettings_checkbox" class="accordion_label" id="meterSettingsALabel">Настройки счетчика</label>
+            <input  type="checkbox" class="accordion_ctrlElement" id="meterSettings_checkbox">
+            <div class="accordion_expandIcon"></div>
+            <div class="accordion_content" id="meterSettingsWrap"></div>
         </div>
-
-        <!--график--> 
-        <div id="ChartContainer">
-            <canvas id="Chart" class="Chart"></canvas>
-        </div>
-    </div>
-    
-    <!--иконка загрузки--> 
-    <div class="loader"></div>
-
-    <!-- Всплывающее окно настроек графика-->
-    <!-- создается с помощью js и все перечисленные ниже элементы также присоединяются-->
-
-
-    <div class="pop_up_body_tabs">
-        <button class="tab" tab-data="#Tab_1">Тренды</button>
-        <button class="tab" tab-data="#Tab_2">Общее</button>
-        <button class="tab" tab-data="#Tab_3">Шкала времени</button>
-        <button class="tab" tab-data="#Tab_4">Шкала значений</button>
-    </div>
-
-    <!--вкладка 1--> 
-    <div class="tab_item cs" id="Tab_1">
-
-        <div class="tab_item_area"> 
-            <h3 class="tab_item_area_topic">Тренды:</h3>
-
-            <div class="tab_item_area_sub">
-                <div class="tab_item_area_sub_column">
-                    <div class="CheckBox_area" id="tab1_checkboxArea"></div>
-                </div>
-                <div class="tab_item_area_sub_column">
-                    <h4>Шкала значений</h4>
-                    <select name="" id="ValueAxisList" class="select">
-                         <!--опции добавляются в скрипте--> 
-                    </select>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="tab_item_area"> 
-            <h3 class="tab_item_area_topic">Эфекты</h3>
-
-            <div class="tab_item_area_sub">
-
-                <div class="tab_item_area_sub_column">
-                    <h4>Тип тренда</h4>
-                    <select name="" id="select_TrendType" class="select">
-                        <option value="stepped=false">линейная</option>
-                        <option value="stepped=before">шаговая до</option>
-                        <option value="stepped=after">шаговая после</option>
-                        <option value="stepped=middle">шаговая середина</option>
-                    </select>
-                </div>
-
-                <div class="tab_item_area_sub_column">
-                    <h4>цвет тренда</h4>
-                    <div class="color-picker" id="color-picker_trends"></div>
-                </div>
-
-                <div class="tab_item_area_sub_column">
-                    <h4>заполнить</h4>
-                    <input type="checkbox" id="CB_Filled" >
-                    <label for="CB_Filled">заполнить</label>
-                </div>
-            </div> 
-
-            <div class="tab_item_area_sub">
-                <div class="tab_item_area_sub_column">
-                    <h4>стили точек</h4>
-                    <select name="" id="select_TrendDots" class="select">
-                        <option value="pointStyle=false">нету</option>
-                        <option value="pointStyle=circle">круг</option>
-                        <option value="pointStyle=cross">перекрестие</option>
-                        <option value="pointStyle=crossRot">crossRot</option>
-                        <option value="pointStyle=dash">dash</option>
-                        <option value="pointStyle=line">линия</option>
-                        <option value="pointStyle=rect">rect</option>
-                        <option value="pointStyle=rectRounded">rectRounded</option>
-                        <option value="pointStyle=rectRot">rectRot</option>
-                        <option value="pointStyle=star">звезда</option>
-                        <option value="pointStyle=triangle">треугольник</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="tab_item_area_sub">
-
-                <div class="tab_item_area_sub_column">
-                    <h4>толщина линии</h4>
-                    <input type="number" id="input_line_width">
-                </div>
-
-                <div class="tab_item_area_sub_column">
-                    <h4>натяжение линии</h4>
-                    <input type="range" id="range_TrendTension" min="0" max="100" >
-                </div>
-
-            </div>
-            
-        </div>    
-    </div>
-
-    <!--вкладка 2--> 
-    <div class="tab_item cs" id="Tab_2"> 
-
-        <div class="tab_item_area"> 
-            <h3 class="tab_item_area_topic">Эфекты</h3>
-            <h4>цвет фона</h4>
-            <div class="color-picker" id="color-picker_Background"></div>
-        </div>  
-    </div>
-
-    <!--вкладка 3--> 
-    <div class="tab_item cs" id="Tab_3">
-
-        <div id="tab_first">
-
-        </div>
-
-
-        <div class="tab_item_area"> 
-            <h3 class="tab_item_area_topic">Эфекты</h3>
-
-             <div class="tab_item_area_sub">
-                <div class="tab_item_area_sub_column">
-                    <h4>цвет оси</h4>
-                    <div class="color-picker" id="color-picker_XScaleline"></div>
-                </div>
-                <div class="tab_item_area_sub_column">
-                    <h4>толщина</h4>
-                    <input type="number" id="XScalelineWidth">
-                </div> 
-            </div>
-
-            <div class="tab_item_area_sub">
-                <div class="tab_item_area_sub_column">
-                    <h4>цвет сетки</h4>
-                    <div class="color-picker" id="color-picker_XScaleGrid"></div>
-                </div>
-                <div class="tab_item_area_sub_column">
-                    <h4>толщина</h4>
-                    <input type="number" id="XScalelineGrid">
-                </div> 
-            </div>
-            
-            <h4>цвет меток</h4>
-            <div class="color-picker" id="color-picker_Xscale"></div>
-                
-        </div>    
-    </div>
-
-    <!--вкладка 4--> 
-    <div class="tab_item cs" id="Tab_4">
         
-        <div class="tab_item_area"> 
-            <h3 class="tab_item_area_topic">Шкалы:</h3>
-            <div class="tab_item_area_sub">
+        <div id="chart_wrapper">
+            <!-- панель инструментов графика -->
+            <div class="ChartToolBoard">
+                <button class="ChartToolBoard_button" id="CTBB_Settings">Настройки графика</button>
+                <button class="ChartToolBoard_button" id="CTBB_Online">Пауза</button>
+                <button class="ChartToolBoard_button" id="CTBB_TimeRange">Период</button>
+                <button class="ChartToolBoard_button" id="CTBB_SelectTrend">Выбрать тренд</button>
+            </div>
 
-                <div class="tab_item_area_sub_column">
-                    <div class="CheckBox_area" id="YscaleListCBArea"></div>
-                    <div>
-                        <button class="notAllowed" id="">Добавить</button>
-                        <button class="notAllowed" id="button_deleteYScale">Удалить</button>
+            <!--график--> 
+            <div id="ChartContainer">
+                <canvas id="Chart" class="Chart"></canvas>
+            </div>
+        </div>
+        
+        <!--иконка загрузки--> 
+        <div class="loader"></div>
+
+        <!-- Всплывающее окно настроек графика-->
+        <!-- создается с помощью js и все перечисленные ниже элементы также присоединяются-->
+
+
+        <div class="pop_up_body_tabs">
+            <button class="tab" tab-data="#Tab_1">Тренды</button>
+            <button class="tab" tab-data="#Tab_2">Общее</button>
+            <button class="tab" tab-data="#Tab_3">Шкала времени</button>
+            <button class="tab" tab-data="#Tab_4">Шкала значений</button>
+        </div>
+
+        <!--вкладка 1--> 
+        <div class="tab_item cs" id="Tab_1">
+
+            <div class="tab_item_area"> 
+                <h3 class="tab_item_area_topic">Тренды:</h3>
+
+                <div class="tab_item_area_sub">
+                    <div class="tab_item_area_sub_column">
+                        <div class="CheckBox_area" id="tab1_checkboxArea"></div>
+                    </div>
+                    <div class="tab_item_area_sub_column">
+                        <h4>Шкала значений</h4>
+                        <select name="" id="ValueAxisList" class="select">
+                            <!--опции добавляются в скрипте--> 
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="tab_item_area"> 
+                <h3 class="tab_item_area_topic">Эфекты</h3>
+
+                <div class="tab_item_area_sub">
+
+                    <div class="tab_item_area_sub_column">
+                        <h4>Тип тренда</h4>
+                        <select name="" id="select_TrendType" class="select">
+                            <option value="stepped=false">линейная</option>
+                            <option value="stepped=before">шаговая до</option>
+                            <option value="stepped=after">шаговая после</option>
+                            <option value="stepped=middle">шаговая середина</option>
+                        </select>
+                    </div>
+
+                    <div class="tab_item_area_sub_column">
+                        <h4>цвет тренда</h4>
+                        <div class="color-picker" id="color-picker_trends"></div>
+                    </div>
+
+                    <div class="tab_item_area_sub_column">
+                        <h4>заполнить</h4>
+                        <input type="checkbox" id="CB_Filled" >
+                        <label for="CB_Filled">заполнить</label>
+                    </div>
+                </div> 
+
+                <div class="tab_item_area_sub">
+                    <div class="tab_item_area_sub_column">
+                        <h4>стили точек</h4>
+                        <select name="" id="select_TrendDots" class="select">
+                            <option value="pointStyle=false">нету</option>
+                            <option value="pointStyle=circle">круг</option>
+                            <option value="pointStyle=cross">перекрестие</option>
+                            <option value="pointStyle=crossRot">crossRot</option>
+                            <option value="pointStyle=dash">dash</option>
+                            <option value="pointStyle=line">линия</option>
+                            <option value="pointStyle=rect">rect</option>
+                            <option value="pointStyle=rectRounded">rectRounded</option>
+                            <option value="pointStyle=rectRot">rectRot</option>
+                            <option value="pointStyle=star">звезда</option>
+                            <option value="pointStyle=triangle">треугольник</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="tab_item_area_sub_column">
-                    <h4>Имя шкалы</h4>
-                    <input  id="YscaleNameInput">
+                <div class="tab_item_area_sub">
 
-                    <h4>Подпись</h4>
-                    <input  id="YscaleTitleInput">
+                    <div class="tab_item_area_sub_column">
+                        <h4>толщина линии</h4>
+                        <input type="number" id="input_line_width">
+                    </div>
 
-                    <h4>Позиция</h4>
-                    <select name="" id="YscalePosSelector" class="select">
-                        <option value="left">слева</option>
-                        <option value="right">справа</option>
-                    </select>
+                    <div class="tab_item_area_sub_column">
+                        <h4>натяжение линии</h4>
+                        <input type="range" id="range_TrendTension" min="0" max="100" >
+                    </div>
+
                 </div>
-            </div>
+                
+            </div>    
         </div>
 
-        <div class="tab_item_area"> 
-            <h3 class="tab_item_area_topic">Диапазон значений</h3>
-            <div class="tab_item_area_sub">
-                <div class="tab_item_area_sub_column">
-                    <h4>от</h4>
-                    <input type="number" id="YscaleFrom_input" min="0" value="0">
-                </div> 
-                <div class="tab_item_area_sub_column">
-                    <h4>до</h4>
-                    <input type="number" id="YscaleTo_input" min="0" value="1">
-                </div>
-            </div>        
-        </div>    
+        <!--вкладка 2--> 
+        <div class="tab_item cs" id="Tab_2"> 
 
-        <div class="tab_item_area"> 
-            <h3 class="tab_item_area_topic">Эфекты</h3>
+            <div class="tab_item_area"> 
+                <h3 class="tab_item_area_topic">Эфекты</h3>
+                <h4>цвет фона</h4>
+                <div class="color-picker" id="color-picker_Background"></div>
+            </div>  
+        </div>
 
-             <div class="tab_item_area_sub">
-                <div class="tab_item_area_sub_column">
-                    <h4>цвет оси</h4>
-                    <div class="color-picker" id="color-picker_YScaleline"></div>
-                </div>
-                <div class="tab_item_area_sub_column">
-                    <h4>толщина</h4>
-                    <input type="number" id="YScalelineWidth">
-                </div> 
+        <!--вкладка 3--> 
+        <div class="tab_item cs" id="Tab_3">
+
+            <div id="tab_first">
+
             </div>
 
-            <div class="tab_item_area_sub">
-                <div class="tab_item_area_sub_column">
-                    <h4>цвет сетки</h4>
-                    <div class="color-picker" id="color-picker_YScaleGrid"></div>
+
+            <div class="tab_item_area"> 
+                <h3 class="tab_item_area_topic">Эфекты</h3>
+
+                <div class="tab_item_area_sub">
+                    <div class="tab_item_area_sub_column">
+                        <h4>цвет оси</h4>
+                        <div class="color-picker" id="color-picker_XScaleline"></div>
+                    </div>
+                    <div class="tab_item_area_sub_column">
+                        <h4>толщина</h4>
+                        <input type="number" id="XScalelineWidth">
+                    </div> 
                 </div>
-                <div class="tab_item_area_sub_column">
-                    <h4>толщина</h4>
-                    <input type="number" id="YScalelineGrid">
-                </div> 
-            </div>
+
+                <div class="tab_item_area_sub">
+                    <div class="tab_item_area_sub_column">
+                        <h4>цвет сетки</h4>
+                        <div class="color-picker" id="color-picker_XScaleGrid"></div>
+                    </div>
+                    <div class="tab_item_area_sub_column">
+                        <h4>толщина</h4>
+                        <input type="number" id="XScalelineGrid">
+                    </div> 
+                </div>
+                
+                <h4>цвет меток</h4>
+                <div class="color-picker" id="color-picker_Xscale"></div>
+                    
+            </div>    
+        </div>
+
+        <!--вкладка 4--> 
+        <div class="tab_item cs" id="Tab_4">
             
-            <h4>цвет меток</h4>
-            <div class="color-picker" id="color-picker_Yscale"></div>
-        </div>   
+            <div class="tab_item_area"> 
+                <h3 class="tab_item_area_topic">Шкалы:</h3>
+                <div class="tab_item_area_sub">
+
+                    <div class="tab_item_area_sub_column">
+                        <div class="CheckBox_area" id="YscaleListCBArea"></div>
+                        <div>
+                            <button class="notAllowed" id="">Добавить</button>
+                            <button class="notAllowed" id="button_deleteYScale">Удалить</button>
+                        </div>
+                    </div>
+
+                    <div class="tab_item_area_sub_column">
+                        <h4>Имя шкалы</h4>
+                        <input  id="YscaleNameInput">
+
+                        <h4>Подпись</h4>
+                        <input  id="YscaleTitleInput">
+
+                        <h4>Позиция</h4>
+                        <select name="" id="YscalePosSelector" class="select">
+                            <option value="left">слева</option>
+                            <option value="right">справа</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab_item_area"> 
+                <h3 class="tab_item_area_topic">Диапазон значений</h3>
+                <div class="tab_item_area_sub">
+                    <div class="tab_item_area_sub_column">
+                        <h4>от</h4>
+                        <input type="number" id="YscaleFrom_input" min="0" value="0">
+                    </div> 
+                    <div class="tab_item_area_sub_column">
+                        <h4>до</h4>
+                        <input type="number" id="YscaleTo_input" min="0" value="1">
+                    </div>
+                </div>        
+            </div>    
+
+            <div class="tab_item_area"> 
+                <h3 class="tab_item_area_topic">Эфекты</h3>
+
+                <div class="tab_item_area_sub">
+                    <div class="tab_item_area_sub_column">
+                        <h4>цвет оси</h4>
+                        <div class="color-picker" id="color-picker_YScaleline"></div>
+                    </div>
+                    <div class="tab_item_area_sub_column">
+                        <h4>толщина</h4>
+                        <input type="number" id="YScalelineWidth">
+                    </div> 
+                </div>
+
+                <div class="tab_item_area_sub">
+                    <div class="tab_item_area_sub_column">
+                        <h4>цвет сетки</h4>
+                        <div class="color-picker" id="color-picker_YScaleGrid"></div>
+                    </div>
+                    <div class="tab_item_area_sub_column">
+                        <h4>толщина</h4>
+                        <input type="number" id="YScalelineGrid">
+                    </div> 
+                </div>
+                
+                <h4>цвет меток</h4>
+                <div class="color-picker" id="color-picker_Yscale"></div>
+            </div>   
+        </div>
+
+        <!-- кнопки ok cancel accept для настроек графика создаются в скрипте-->
+
+        <!-- Всплывающее окно выбора периода на графике-->
+        <!-- создается с помощью js и все перечисленные ниже элементы также присоединяются-->   
+        
+        <!-- Область выбора диапазона времени во всплывающем окне-->
+        <!-- создается с помощью js и присоединяется к созданному выше всплывающему окну-->  
+
+        <!-- кнопки ok cancel accept для диапазона времени создаются в скрипте-->   
+
+        <!-- Всплывающее окно списка трендов-->
+        <!-- создается с помощью js и все перечисленные ниже элементы также присоединяются-->
     </div>
-
-    <!-- кнопки ok cancel accept для настроек графика создаются в скрипте-->
-
-    <!-- Всплывающее окно выбора периода на графике-->
-    <!-- создается с помощью js и все перечисленные ниже элементы также присоединяются-->   
-    
-    <!-- Область выбора диапазона времени во всплывающем окне-->
-    <!-- создается с помощью js и присоединяется к созданному выше всплывающему окну-->  
-
-    <!-- кнопки ok cancel accept для диапазона времени создаются в скрипте-->   
-
-    <!-- Всплывающее окно списка трендов-->
-    <!-- создается с помощью js и все перечисленные ниже элементы также присоединяются-->
+   
 
     <script type="module" src="Js/Chart-1.js"></script>
     <script type="module" src="Js/Chart_Config_tab1.js"></script>

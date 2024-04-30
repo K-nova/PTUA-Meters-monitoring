@@ -3,7 +3,8 @@ import {PageElements, ChartCtrl, TrainingMessages, locStorName,
 
  //import{ChartColl} from '/Charts/Js/Charts_main.js';    
  
-//console.log(forChartPage)
+//-----инициируем элементы страницы для разных функций
+let workspace_iframe=window.parent.document.querySelector('.workspace-iframe');
 
 //------диаграмма
 //блокирующий фон для тренировочных сообщений
@@ -57,17 +58,19 @@ loadDataToChart(DFSType,DFSstartVal,DFSecondVal);
 //------------настройки счетчика
 //изменение родительского экрана
 let meterSettings_checkbox=document.querySelector('#meterSettings_checkbox');
-let workspace_iframe=window.parent.document.querySelector('.workspace-iframe');
+let meterSettingsWrap=document.querySelector('#meterSettingsWrap');
+
+let ws_iframe_heightInit;
 meterSettings_checkbox.addEventListener('click',()=>{
     if(meterSettings_checkbox.checked){
-        workspace_iframe.style.minHeight=workspace_iframe.offsetHeight+500+'px';
+        ws_iframe_heightInit=workspace_iframe.offsetHeight;
+        workspace_iframe.style.height=workspace_iframe.offsetHeight+meterSettingsWrap.offsetHeight+100+'px';
     }else{
-        workspace_iframe.style.minHeight=workspace_iframe.offsetHeight-500+'px';
+        workspace_iframe.style.height=ws_iframe_heightInit+'px';
     }
 })
 
 //
-let meterSettingsWrap=document.querySelector('#meterSettingsWrap');
 let MeterSetting=new PageElements.MeterSettingsContent(meterSettingsWrap);
 let meterSettingsData=ServerDataExchange.getMeterSettings(forChartPageData.idPath);
 
@@ -241,11 +244,10 @@ for(let dataset of Chart.cData.datasets){
 }
 
 
-//------------Pop-up настроек
+//------------Pop-up настроек графика
 let OpenSettingsPopUp=document.querySelector("#CTBB_Settings");
 //создаем Pop-up
 export let ChartSettingsPopUp=new PageElements.PopUp(document.body, OpenSettingsPopUp);
-
 
 //---------Pop-up tabs
 //присоединяем табы
@@ -281,14 +283,43 @@ for(let TabItem of CStabItems){
     ChartSettingsPopUp.body.appendChild(TabItem);
 }
 
-//присоединяем кнопки ок/отмена/применить
-export let chartSetOCA=new PageElements.OkCancelAccept(ChartSettingsPopUp.body);
-
-
 //активируем первую вкладку
 tabs[0].click();
 
-//training messages
+//--------кнопки ок/отмена/применить
+export let chartSetOCA=new PageElements.OkCancelAccept(ChartSettingsPopUp.body);
+//изменение родительского экрана
+
+let ws_iframe_heightInit2;
+ChartSettingsPopUp.calllButton.addEventListener('click',()=>{
+    if(ChartSettingsPopUp.displayed){
+        ws_iframe_heightInit2=workspace_iframe.offsetHeight;
+        if(workspace_iframe.offsetHeight<ChartSettingsPopUp.body.offsetHeight){
+            workspace_iframe.style.height=ChartSettingsPopUp.body.offsetHeight+20+'px';
+        }
+    }else{
+        workspace_iframe.style.height=ws_iframe_heightInit2;
+    }
+})
+
+let ws_iframe_backToInitHeight=()=>{
+    workspace_iframe.style.height=ws_iframe_heightInit2+'px';
+}
+
+ChartSettingsPopUp.closeButton.addEventListener('click',()=>{
+    ws_iframe_backToInitHeight();
+})
+
+chartSetOCA.accept.addEventListener("click", ()=>{
+    ws_iframe_backToInitHeight();
+})
+
+chartSetOCA.cancel.addEventListener("click", ()=>{
+    ws_iframe_backToInitHeight();
+})
+
+
+//------training messages Pop-up tabs
 let TrainingMessagesTS=new TrainingMessages('trendSettings',[
     {target:tabs[0], text:'Чтобы переключатся между группами настройки нажимайте соответствующие вкладки'},
     {target:chartSetOCA.ok, text:'Чтобы изменения вступили в силу нажмите данную кнопку. <br>Важно! Изменения применятся со всех вкладок'},

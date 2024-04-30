@@ -1187,6 +1187,13 @@ export class ChartsCollection{
         this.workspaceContent.chartPage.className='workspace-iframe';
         this.workspace.element.appendChild(this.workspaceContent.chartPage);
 
+
+        this.workspaceContent.win=this.workspaceContent.chartPage.contentWindow;
+        this.workspaceContent.win.addEventListener('load', ()=> {
+            this.workspaceContent.doc=this.workspaceContent.win.document;
+            this.workspaceContent.bodyWrapper=this.workspaceContent.doc.querySelector('#bodyWrapper');
+            this.workspaceContent.chartPage.style.height=this.workspaceContent.bodyWrapper.offsetHeight+10+'px';
+        })
         
         
     };
