@@ -1,5 +1,5 @@
-import {trendSetpoints} from "../GlobalConst.js";
-import {locStorName} from "../Functions.js";
+import {trendSetpoints, meterSetting} from "../GlobalConst.js";
+import {locStorName,getFileSity} from "../Functions.js";
 
 //класс обмена данными с сервером
 export let ServerDataExchange=class{
@@ -310,7 +310,7 @@ export let ServerDataExchange=class{
             result=JSON.parse(sessionStorage.getItem(locStorName(this.Aux.treeDataLocStorageName)));
             //если данных в сессии нет
             if(!(result instanceof Object)){
-                result= getFileSity('../../Main/Data/TreeData.json');
+                result= getFileSity("/Main/Data/TreeData.json");
                 //добавляем стандартные настройки счетчика
                 addMeterSettingsF(result);
                 //сохраняем данные в локальной сессии

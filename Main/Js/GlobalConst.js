@@ -31,7 +31,7 @@ export const trendSetpoints=[
     {name:"cosf_L2", label:'cos φ фазы L2', yAxisID:'y6'},
     {name:"cosf_L3", label:'cos φ фазы L3', yAxisID:'y6'}
 ];
-const meterSetting={
+export const meterSetting={
     exchangeTimeType: "1000",
     exchangeTimeValue: '5',
     ip:['10','0','0','0'],

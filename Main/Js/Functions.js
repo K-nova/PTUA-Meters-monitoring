@@ -160,9 +160,6 @@ function isJSON(str) {
     }
 }
 
-//-------
-
-
 //---------
 //установить экран в Main
 export function SetMCPage(Page){
@@ -2130,5 +2127,3 @@ export class TrainingMessages{
         }
     }
 }
-
-
