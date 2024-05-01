@@ -1,5 +1,8 @@
-import {PageElements, ChartCtrl, TrainingMessages, locStorName,
-     ServerDataExchange, DateTime, ChartsCollection} from "../../Main/Js/Functions.js";
+import {ChartCtrl, TrainingMessages, locStorName,
+     DateTime, ChartsCollection} from "../../Main/Js/Functions.js";
+
+import {PageElements} from "../../Main/Js/PageElements/PageElements.js";
+import {ServerDataExchange} from "../../Main/Js/ServerDataExchange/ServerDataExchange.js";
 
  //import{ChartColl} from '/Charts/Js/Charts_main.js';    
  
