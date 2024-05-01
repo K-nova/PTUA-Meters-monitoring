@@ -259,14 +259,26 @@ export class ServerDataExchange{
         ],
 
         //уровень генерации случайных чисел в симулированных данных
-        SimTrendRndLevles:[80, 82, 78,
-            400, 380, 420,
-            405, 385, 425,
-            1024, 978, 1236,
-            1524, 1478,1736,
-            500,500,500,
-            50,
-            0.5,0.5, 0.5, 0.5
+        SimTrendRndLevles:[80, 82, 78, //ток
+            400, 380, 420, //фазное напряжение
+            405, 385, 425, //линейное
+            1079, 1024, 978, 1236, //активная мощность
+            1579, 1524, 1478,1736, //полная мощность
+            500, 500,500,500, //реактивная мощность
+            50, //частота
+            0.5,0.5, 0.5, 0.5 //cos фи
+        ],
+
+        //уровень отклонения случайных чисел в сим. даных
+        simTrendRndDisturbance:[
+            21, 21, 21, //ток
+            21, 21, 21, //фазное напряжение
+            21,21,21, //линейное
+            21, 21, 21,21, //активная мощность
+            21,21,21,21, // полная мощность
+            21,21,21,21, //реактивная мощность
+            1, //частота
+            0.2, 0.2, 0.2, 0.2 //cos фи
         ],
 
         GetSimChartData:function(idPath,timeRange){
@@ -362,10 +374,9 @@ export class ServerDataExchange{
                                     //если опрос счетчика активирован
                                     if(meterSettingsData.dataExchange[sti].active){
                                         this.SimDataFromServer.Trends[sti].Points[i]=
-                                        Math.floor(Math.random() * 21) + this.SimTrendRndLevles[sti];
-                                    }
+                                        Math.random() * this.simTrendRndDisturbance[sti] + this.SimTrendRndLevles[sti];
                                     //если опрос счетчика не активирован
-                                    else{
+                                    }else{
                                         this.SimDataFromServer.Trends[sti].Points[i]=0;
                                     }
                                     
@@ -2531,6 +2542,7 @@ export class TrainingMessages{
         if(!this.trainingFinished){
             let message=new PageElements.TrainingMessage(targetOptions[this.optionsNum].target,
                 targetOptions[this.optionsNum].text, targetOptions[this.optionsNum].left, 
+                targetOptions[this.optionsNum].top, 
                 targetOptions[this.optionsNum].disableCloseButton);
             
             message.wraper.style.zIndex=this.#zIndex;
@@ -2556,6 +2568,7 @@ export class TrainingMessages{
                         //создаем новое сообщение
                         let message=new PageElements.TrainingMessage(targetOptions[this.optionsNum].target,
                             targetOptions[this.optionsNum].text, targetOptions[this.optionsNum].left,
+                            targetOptions[this.optionsNum].top, 
                             targetOptions[this.optionsNum].disableCloseButton);
                         
                         message.wraper.style.zIndex=this.#zIndex;
@@ -3462,10 +3475,12 @@ export var PageElements={
 
         closed=true;
         left;
+        top;
 
-        constructor(target, text, left=false, disableCloseButton=false){
+        constructor(target, text, left=false, top=false, disableCloseButton=false){
             this.target=target;
             this.left=left;
+            this.top=top;
 
             this.wraper=document.createElement('div');
             this.wraper.className='trainingMessage';
@@ -3473,15 +3488,8 @@ export var PageElements={
 
             this.setPositionByTarget();
 
-            this.arrowWrapper=document.createElement('div');
-            this.arrowWrapper.className='trainingMessageArrowWrapper';
-            this.wraper.appendChild(this.arrowWrapper);
-            if(this.left){ this.arrowWrapper.classList.add('left');}
-
-            this.arrow=document.createElement('div');
-            this.arrow.className='trainingMessageArrow';
-            this.arrowWrapper.appendChild(this.arrow);
-
+            if(!this.top){this.#createArrow();}
+            
             this.window=document.createElement('div');
             this.window.className='trainingMessageWindow';
             this.wraper.appendChild(this.window);
@@ -3500,6 +3508,8 @@ export var PageElements={
             this.text.className='trainingMessageContent';
             this.text.innerHTML  = text;
             this.window.appendChild(this.text);
+
+            if(this.top){this.#createArrow();}
 
              //-----подключаем команды кнопкам управления
              //закрывающая кнопка
@@ -3529,6 +3539,7 @@ export var PageElements={
 
         setPositionByTarget=()=>{
             let targetRect=this.target.getBoundingClientRect();//получаем координаты целевого элемента
+            
             // Устанавливаем позицию по горизонтали
             if(!this.left){
                 this.wraper.style.left = targetRect.left+this.target.offsetWidth*0.2+ 'px';     
@@ -3536,8 +3547,25 @@ export var PageElements={
                 this.wraper.style.left = targetRect.left-this.wraper.offsetWidth+this.target.offsetWidth*0.3+ 'px'; 
             }
             // Устанавливаем позицию по вертикали
-            this.wraper.style.top = targetRect.top+this.target.offsetHeight*0.5 + 'px'; 
+            if(!this.top){
+                this.wraper.style.top = targetRect.top+this.target.offsetHeight*0.5 + 'px'; 
+            }else{
+                this.wraper.style.top = targetRect.top-this.wraper.offsetHeight + 'px'; 
+            }
             
+            
+        }
+
+        #createArrow=()=>{
+            this.arrowWrapper=document.createElement('div');
+            this.arrowWrapper.className='trainingMessageArrowWrapper';
+            this.wraper.appendChild(this.arrowWrapper);
+            if(this.left){ this.arrowWrapper.classList.add('left');}
+
+            this.arrow=document.createElement('div');
+            if(!this.top){this.arrow.className='trainingMessageArrow';}
+            else{this.arrow.className='trainingMessageArrowDown';}
+            this.arrowWrapper.appendChild(this.arrow);
         }
 
     },
