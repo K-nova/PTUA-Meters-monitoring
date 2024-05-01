@@ -180,7 +180,7 @@ let TrainingMessagesMS=new TrainingMessages('meterSettings',[
     {target:MeterSetting.mSArea3.subArea1.column1.cbList.checkBoxes[0], text:'установите, или отмените опрос счетчика. При выключенном опросе значения будут равнятся нулю'},
     {target:MeterSetting.mSArea3.subArea2.column1.input_metter_timeValue, text:'данные настройки позволяют изменить период опроса счетчика'},
     {target:MeterSetting.okCancelAccept.accept, text:'чтобы изменения вступили в силу нажмите "Применить"', left:true},
-    {target:document.querySelector('#meterSettings .accordion_label'), text:'нажмите, чтоб скрыть меню настройки текущего счетчика' ,disableCloseButton:true},
+    {target:document.querySelector('#meterSettings .accordion_label'), text:'нажмите, чтоб скрыть меню настройки текущего счетчика',disableCloseButton:true},
     ]);
 
 TrainingMessagesMS.setZIndex(chartCover_zIndex+1);
@@ -322,7 +322,7 @@ chartSetOCA.cancel.addEventListener("click", ()=>{
 //------training messages Pop-up tabs
 let TrainingMessagesTS=new TrainingMessages('trendSettings',[
     {target:tabs[0], text:'Чтобы переключатся между группами настройки нажимайте соответствующие вкладки'},
-    {target:chartSetOCA.ok, text:'Чтобы изменения вступили в силу нажмите данную кнопку. <br>Важно! Изменения применятся со всех вкладок'},
+    {target:chartSetOCA.ok, text:'Чтобы изменения вступили в силу нажмите данную кнопку. <br>Важно! Изменения применятся со всех вкладок', top:true},
     ]);
 
 TrainingMessagesTS.hide();
