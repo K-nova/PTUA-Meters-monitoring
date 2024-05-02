@@ -1,6 +1,7 @@
 import {trendSetpoints, meterSetting} from "../GlobalConst.js";
-import {locStorName, getFileSity} from "../Functions.js";
+import {locStorName} from "../Functions.js";
 import {ServerDataExchange} from "./ServerDataExchange.js";
+import {defSimTreeData} from "./defSimTreeData.js";
 
 //Singleton класс
 export class ServDataExchangeSim{
@@ -146,7 +147,7 @@ export class ServDataExchangeSim{
         result=JSON.parse(sessionStorage.getItem(locStorName(this.#TREE_DATA_SORAGE_NAME)));
         //если данных в сессии нет
         if(!(result instanceof Object)){
-            result= getFileSity("../../../Data/TreeData.json");
+            result= defSimTreeData;
             //добавляем стандартные настройки счетчика
             addMeterSettingsF(result);
             //сохраняем данные в локальной сессии
