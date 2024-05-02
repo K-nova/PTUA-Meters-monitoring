@@ -146,7 +146,7 @@ export class ServDataExchangeSim{
         result=JSON.parse(sessionStorage.getItem(locStorName(this.#TREE_DATA_SORAGE_NAME)));
         //если данных в сессии нет
         if(!(result instanceof Object)){
-            result= getFileSity("../../../Data/TreeData.json");
+            result= getFileSity("../../../../Main/Data/TreeData.json");
             //добавляем стандартные настройки счетчика
             addMeterSettingsF(result);
             //сохраняем данные в локальной сессии
