@@ -1,8 +1,7 @@
-import {ChartsCollection, 
-    } from "../../Main/Js/Functions.js";
 
-import {PageElements} from "../../Main/Js/PageElements/PageElements.js";
-import {ServerDataExchange} from "../../Main/Js/ServerDataExchange/ServerDataExchange.js";
+import {ChartsCollection} from "/Main/Js/sys/ChartsCollection.js";
+import {PageElements} from "/Main/Js/sys/PageElements/PageElements.js";
+import {ServerDataExchange} from "/Main/Js/sys/ServerDataExchange/ServerDataExchange.js";
 
 //создаем структуру
 export let ChartColl=new ChartsCollection();

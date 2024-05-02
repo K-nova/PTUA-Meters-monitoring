@@ -1,6 +1,6 @@
 //глобальные переменные
 const projectId='PTUA_MeterMon';
-const LocSessionName2="ChartProperies";
+export const LocSessionName2="ChartProperies";
 export const LocSessionName3="LastChartDataPath";
 export const LocSessionName4="ChartPageDataArr";
 export const trendSetpoints=[

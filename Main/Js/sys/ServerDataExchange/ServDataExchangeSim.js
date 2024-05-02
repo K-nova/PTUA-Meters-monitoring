@@ -1,4 +1,4 @@
-import {trendSetpoints} from "../GlobalConst.js";
+import {trendSetpoints, meterSetting} from "../GlobalConst.js";
 import {locStorName, getFileSity} from "../Functions.js";
 import {ServerDataExchange} from "./ServerDataExchange.js";
 
@@ -94,9 +94,7 @@ export class ServDataExchangeSim{
     }
 
     //данные по предыдущему симулированному обменну данных
-    #simPrevExchangeTimeStamps=[
-
-    ]
+    #simPrevExchangeTimeStamps=[];
 
     //уровень генерации случайных чисел в симулированных данных
     #simTrendRndLevles=[80, 82, 78, //ток
