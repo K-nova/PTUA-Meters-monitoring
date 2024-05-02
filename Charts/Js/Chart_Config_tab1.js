@@ -1,6 +1,6 @@
 import {Chart} from "./Chart-1.js";
 
-import {PageElements} from "/Main/Js/sys/PageElements/PageElements.js";
+import {PageElements} from "../../Main/Js/sys/PageElements/PageElements.js";
 
 
 //---------Список трендов

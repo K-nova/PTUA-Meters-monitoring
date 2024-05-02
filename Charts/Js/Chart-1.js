@@ -1,11 +1,11 @@
-import {locStorName} from "/Main/Js/sys/Functions.js";
+import {locStorName} from "../../Main/Js/sys/Functions.js";
 
-import {ChartsCollection} from "/Main/Js/sys/ChartsCollection.js";
-import {ChartCtrl} from "/Main/Js/sys/ChartCtrl/ChartCtrl.js";
-import {DateTime} from "/Main/Js/sys/DateTime.js";
-import {PageElements} from "/Main/Js/sys/PageElements/PageElements.js";
-import {ServerDataExchange} from "/Main/Js/sys/ServerDataExchange/ServerDataExchange.js";
-import {TrainingMessages} from "/Main/Js/sys/TrainingMessages.js";
+import {ChartsCollection} from "../../Main/Js/sys/ChartsCollection.js";
+import {ChartCtrl} from "../../Main/Js/sys/ChartCtrl/ChartCtrl.js";
+import {DateTime} from "../../Main/Js/sys/DateTime.js";
+import {PageElements} from "../../Main/Js/sys/PageElements/PageElements.js";
+import {ServerDataExchange} from "../../Main/Js/sys/ServerDataExchange/ServerDataExchange.js";
+import {TrainingMessages} from "../../Main/Js/sys/TrainingMessages.js";
 
  //import{ChartColl} from '/Charts/Js/Charts_main.js';    
  

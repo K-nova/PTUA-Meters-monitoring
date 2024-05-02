@@ -1,4 +1,4 @@
-import {locStorName} from "/Main/Js/sys/Functions.js";
+import {locStorName} from "../../Main/Js/sys/Functions.js";
 
 let i=0;
 let slideshowItems=document.querySelectorAll('.slideshow-item');
