@@ -159,9 +159,7 @@ let meterSettingApply=()=>{
         meterSettings:setMeterData.meterSettings
 
     })
-
     if(setMeterResponse.err){
-        
         if(setMeterResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
             MeterSetting.addNameErr('Такое имя уже существует в данной папке!');          
 

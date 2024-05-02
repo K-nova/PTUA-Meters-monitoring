@@ -472,16 +472,27 @@ export class ChartsCollection{
                         this.#setContent(dataItem);  
                     }
                 })
+
                 treeButton.addEventListener('blur',(event)=>{
                     if(treeButton.onEdit){
                         treeButton.className='tree-title';
                         treeButton.setAttribute('readonly', 'true');
                         treeButton.onEdit=false;
-                        ServerDataExchange.renameItem({
+                        let renameItemResponse=ServerDataExchange.renameItem({
                             idPath:this.mouseMTreeMenuEventPath.idPath,
                             text: treeButton.value
                         });
-                        this.constructWS();
+
+                        if(renameItemResponse.err){
+                            if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
+                                treeButton.value=dataItem.text;
+                                alert('Такое имя уже существует в данной папке!');
+                            }
+                        }else{
+                            dataItem.text=treeButton.value;
+                        }
+                        
+                        //this.constructWS();
                     }
                 })
             }
