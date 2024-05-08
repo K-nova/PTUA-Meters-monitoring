@@ -7,25 +7,39 @@ export let ServerDataExchange=class{
     static ERR_NAMEALREADYEXIST='err: name already exist in folder';
 
     //получить данные по графику счетчика
-    static GetChartData=function(idPath,timeRange){
+    static async GetChartData(idPath,timeRange){
         let result;
 
         if(this.DataExchangeSimulation){
-          result = new ServDataExchangeSim().getChartData(idPath,timeRange);
+          result =await new ServDataExchangeSim().getChartData(idPath,timeRange);
         }
 
         return result;
     };
 
     //получить данные по структуре дерева
-    static getTreeStructureData=function(){
+    static async getTreeStructureData(){
         let result;
         //симуляция обмена данными с сервером
         if(this.DataExchangeSimulation){
-            result=new ServDataExchangeSim().getTreeStructureData();    
+            result=await new ServDataExchangeSim().getTreeStructureData();
          }
+
+         //обмен данными с сервером
+         else{
+            try{
+                let response=await fetch('http://172.17.1.65/api/meters',{
+                    method: "GET", 
+                    //mode: 'no-cors',
+                    //headers: {'Content-Type': 'application/json'}
+                })
+                result=await response.json();
+            }
+            catch(err){
+                console.error('Произошла ошибка:', err);
+            }
+        }
  
-         //console.log('getTreeStructureData', result)
          return result;
     };
 

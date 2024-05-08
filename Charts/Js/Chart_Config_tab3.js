@@ -1,155 +1,170 @@
 import {PageElements} from "../../Main/Js/sys/PageElements/PageElements.js";
 import {Chart} from "./Chart-1.js";
 
-//---------диапазон времени
-//создаем область выбора времени
-let confTimeRangeArea=PageElements.CreateTimeRangeSettings(document.querySelector("#tab_first"), 'confTimeRangeArea');
-
-//блокируем функционал
-//confTimeRangeArea.setStateF('2');
-//confTimeRangeArea.timeRangeSelector.classList.add('notAllowed');
-confTimeRangeArea.TimeRangeSelectorOptions[2].disabled=true;
-
-//текущий режим выбора времени
-confTimeRangeArea.timeRangeSelector.value=Chart.getOptionsProp("scales=x=timeRangeSelector");
-
-//текущие пределы
-// confTimeRangeArea.startTime_ADP.selectDate(Chart.getMinTime());
-// confTimeRangeArea.endTime_ADP.selectDate(Chart.getMaxTime());
-confTimeRangeArea.timeRangeInput.value= Chart.getOptionsProp("scales=x=timeRangeInput"); 
-confTimeRangeArea.timeRangeItemSelect.value= Chart.getOptionsProp("scales=x=timeRangeItemSelect"); 
-
-//экспортируем элементы
-export let XScaleTimeRangeSettings=confTimeRangeArea;
-
-//---------элемент цвета оси
-
-const pickr_XScaleline = Pickr.create({
-    el: '#color-picker_XScaleline',
-    theme: 'classic', // or 'monolith', or 'nano'
-
-    swatches: Chart.defaultPar.options.scales.x.ticks.color,
-
-    components: {
-
-        // Main components
-        preview: true,
-        opacity: true,
-        hue: true,
-
-        // Input / output Options
-        interaction: {
-            hex: true,
-            rgba: true,
-            hsla: false,
-            hsva: false,
-            cmyk: false,
-            input: true,
-            clear: true,
-            save: true
-        }
+//Singleton класс
+export class Chart_Config_tab3{
+    confTimeRangeArea; 
+    borderColor_XScaleline;
+    xScalelineWidth;
+    borderColor_XScaleGrid;
+    xScaleGridWidth;
+    borderColor_Xscales;
+    
+    //конструктор
+    constructor(){
+        if(typeof Chart_Config_tab3.instance==='object'){return Chart_Config_tab3.instance;}
+        Chart_Config_tab3.instance=this;
+        this.#mainConstruct();
+        return this;
     }
-});
 
-//добавляем логику выбора цвета
-export let borderColor_XScaleline=Chart.getOptionsProp("scales=x=border=color");
+    //
+    #mainConstruct=()=>{
+        //---------диапазон времени
+        //создаем область выбора времени
+        this.confTimeRangeArea=PageElements.CreateTimeRangeSettings(document.querySelector("#tab_first"), 'confTimeRangeArea');
 
-pickr_XScaleline.on('init', instance => {
-    pickr_XScaleline.setColor(borderColor_XScaleline);
+        //блокируем функционал
+        this.confTimeRangeArea.TimeRangeSelectorOptions[2].disabled=true;
 
-})
+        //текущий режим выбора времени
+        this.confTimeRangeArea.timeRangeSelector.value=Chart.getOptionsProp("scales=x=timeRangeSelector");
 
-pickr_XScaleline.on('save', (color) => {
-    borderColor_XScaleline= color.toHEXA().toString();
-})
+        //текущие пределы
+        this.confTimeRangeArea.timeRangeInput.value= Chart.getOptionsProp("scales=x=timeRangeInput"); 
+        this.confTimeRangeArea.timeRangeItemSelect.value= Chart.getOptionsProp("scales=x=timeRangeItemSelect"); 
 
-//---------элемент толщины линии оси
-export let XScalelineWidth=document.querySelector("#XScalelineWidth");
-XScalelineWidth.value=Chart.getOptionsProp("scales=x=border=width");
-PageElements.setInputMinMax(XScalelineWidth, 0.5, 30);
+        //---------элемент цвета оси
 
-//---------элемент цвета сетки
-const pickr_XScaleGrid = Pickr.create({
-    el: '#color-picker_XScaleGrid',
-    theme: 'classic', // or 'monolith', or 'nano'
+        const pickr_XScaleline = Pickr.create({
+            el: '#color-picker_XScaleline',
+            theme: 'classic', // or 'monolith', or 'nano'
 
-    swatches: Chart.defaultPar.options.scales.x.ticks.color,
+            swatches: Chart.defaultPar.options.scales.x.ticks.color,
 
-    components: {
+            components: {
 
-        // Main components
-        preview: true,
-        opacity: true,
-        hue: true,
+                // Main components
+                preview: true,
+                opacity: true,
+                hue: true,
 
-        // Input / output Options
-        interaction: {
-            hex: true,
-            rgba: true,
-            hsla: false,
-            hsva: false,
-            cmyk: false,
-            input: true,
-            clear: true,
-            save: true
-        }
+                // Input / output Options
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsla: false,
+                    hsva: false,
+                    cmyk: false,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
+
+        //добавляем логику выбора цвета
+        this.borderColor_XScaleline =Chart.getOptionsProp("scales=x=border=color");
+
+        pickr_XScaleline.on('init', instance => {
+            pickr_XScaleline.setColor(this.borderColor_XScaleline);
+
+        })
+
+        pickr_XScaleline.on('save', (color) => {
+            this.borderColor_XScaleline= color.toHEXA().toString();
+        })
+
+        //---------элемент толщины линии оси
+        this.xScalelineWidth=document.querySelector("#XScalelineWidth");
+        this.xScalelineWidth.value=Chart.getOptionsProp("scales=x=border=width");
+        PageElements.setInputMinMax(this.xScalelineWidth, 0.5, 30);
+
+        //---------элемент цвета сетки
+        const pickr_XScaleGrid = Pickr.create({
+            el: '#color-picker_XScaleGrid',
+            theme: 'classic', // or 'monolith', or 'nano'
+
+            swatches: Chart.defaultPar.options.scales.x.ticks.color,
+
+            components: {
+
+                // Main components
+                preview: true,
+                opacity: true,
+                hue: true,
+
+                // Input / output Options
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsla: false,
+                    hsva: false,
+                    cmyk: false,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
+
+        //добавляем логику выбора цвета
+        this.borderColor_XScaleGrid=Chart.getOptionsProp("scales=x=grid=color");
+
+        pickr_XScaleGrid.on('init', instance => {
+            pickr_XScaleGrid.setColor(this.borderColor_XScaleGrid);
+
+        })
+
+        pickr_XScaleGrid.on('save', (color) => {
+            this.borderColor_XScaleGrid= color.toHEXA().toString();
+        })
+
+        //---------элемент толщины линии сетки
+        this.xScaleGridWidth=document.querySelector("#XScalelineGrid");
+        this.xScaleGridWidth.value=Chart.getOptionsProp("scales=x=grid=lineWidth");
+        PageElements.setInputMinMax(this.xScaleGridWidth, 0.5, 30);
+
+        //---------элемент цвета меток
+
+        const pickr_Xaxis = Pickr.create({
+            el: '#color-picker_Xscale',
+            theme: 'classic', // or 'monolith', or 'nano'
+
+            swatches: Chart.defaultPar.options.scales.x.ticks.color,
+
+            components: {
+
+                // Main components
+                preview: true,
+                opacity: true,
+                hue: true,
+
+                // Input / output Options
+                interaction: {
+                    hex: true,
+                    rgba: true,
+                    hsla: false,
+                    hsva: false,
+                    cmyk: false,
+                    input: true,
+                    clear: true,
+                    save: true
+                }
+            }
+        });
+
+        //добавляем логику выбора цвета
+        this.borderColor_Xscales=Chart.getOptionsProp("scales=x=ticks=color");
+
+        pickr_Xaxis.on('init', instance => {
+            pickr_Xaxis.setColor(this.borderColor_Xscales);
+
+        })
+
+        pickr_Xaxis.on('save', (color) => {
+            this.borderColor_Xscales= color.toHEXA().toString();
+        })
     }
-});
+}
 
-//добавляем логику выбора цвета
-export let borderColor_XScaleGrid=Chart.getOptionsProp("scales=x=grid=color");
-
-pickr_XScaleGrid.on('init', instance => {
-    pickr_XScaleGrid.setColor(borderColor_XScaleGrid);
-
-})
-
-pickr_XScaleGrid.on('save', (color) => {
-    borderColor_XScaleGrid= color.toHEXA().toString();
-})
-
-//---------элемент толщины линии сетки
-export let XScaleGridWidth=document.querySelector("#XScalelineGrid");
-XScaleGridWidth.value=Chart.getOptionsProp("scales=x=grid=lineWidth");
-PageElements.setInputMinMax(XScaleGridWidth, 0.5, 30);
-
-//---------элемент цвета меток
-
-const pickr_Xaxis = Pickr.create({
-    el: '#color-picker_Xscale',
-    theme: 'classic', // or 'monolith', or 'nano'
-
-    swatches: Chart.defaultPar.options.scales.x.ticks.color,
-
-    components: {
-
-        // Main components
-        preview: true,
-        opacity: true,
-        hue: true,
-
-        // Input / output Options
-        interaction: {
-            hex: true,
-            rgba: true,
-            hsla: false,
-            hsva: false,
-            cmyk: false,
-            input: true,
-            clear: true,
-            save: true
-        }
-    }
-});
-
-//добавляем логику выбора цвета
-export let borderColor_Xscales=Chart.getOptionsProp("scales=x=ticks=color");
-
-pickr_Xaxis.on('init', instance => {
-    pickr_Xaxis.setColor(borderColor_Xscales);
-
-})
-
-pickr_Xaxis.on('save', (color) => {
-    borderColor_Xscales= color.toHEXA().toString();
-})

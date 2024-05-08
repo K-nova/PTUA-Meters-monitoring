@@ -1,120 +1,135 @@
 import {DateTime} from "../../Main/Js/sys/DateTime.js";
 
-import {Chart,ChartSettingsPopUp,chartSetOCA,chartContainer} from "./Chart-1.js";
+import {Chart,Chart_Config_PopUp_inst,chartContainer} from "./Chart-1.js";
 
-import {CheckBoxArr,DotSelector,LineWidthInput,borderColor_trends, valueAxisList,
-     CB_Filled,range_TrendTension, select_TrendType} from "./Chart_Config_tab1.js";
+import {Chart_Config_tab1} from "./Chart_Config_tab1.js";
 
-import {borderColor_Background} from "./Chart_Config_tab2.js"; 
+import {Chart_Config_tab2} from "./Chart_Config_tab2.js"; 
 
-import {borderColor_Xscales,
-    borderColor_XScaleline,XScalelineWidth,borderColor_XScaleGrid,
-    XScaleGridWidth, XScaleTimeRangeSettings} from "./Chart_Config_tab3.js";
+import {Chart_Config_tab3} from "./Chart_Config_tab3.js";
 
-import {YscaleList, borderColor_Yscales,  YscalePosSelector, YscaleTitleInput, YscaleNameInput,
-        borderColor_YScaleline,YScalelineWidth,borderColor_YScaleGrid,
-        YScaleGridWidth, YscaleFrom_input, YscaleTo_input, YscaleNameListBuild} from "./Chart_Config_tab4.js";    
+import {Chart_Config_tab4} from "./Chart_Config_tab4.js";    
 
-//функция применения настроек
-let acceptSettings=()=>{
-    //настройки трендов
-    //проходим по выбраным трендам
-    CheckBoxArr.forEach((checkbox)=>{
-        if(checkbox.checked==true){
 
-            Chart.setDatasetProp(checkbox.value,`yAxisID=${valueAxisList.value}`);
+//Singleton класс
+export class Chart_Config_Buttons{
 
-            Chart.setDatasetProp(checkbox.value,select_TrendType.value);
+    //конструктор
+    constructor(){
+        if(typeof Chart_Config_Buttons.instance==='object'){return Chart_Config_Buttons.instance;}
+        Chart_Config_Buttons.instance=this;
 
-            Chart.setDatasetProp(checkbox.value,`borderColor=${borderColor_trends}`);
-            Chart.setDatasetProp(checkbox.value,`backgroundColor=${borderColor_trends+'7F'}`);
+        //----------кнопка применить
+        Chart_Config_PopUp_inst.chartSetOCA.accept.addEventListener("click", ()=>{
+            this.acceptSettings();
+        });
 
-            
-            Chart.setDatasetProp(checkbox.value,`fill=${CB_Filled.checked}`);
+        //----------кнопка ок
+        Chart_Config_PopUp_inst.chartSetOCA.ok.addEventListener("click", ()=>{
+            this.acceptSettings();
+            Chart_Config_PopUp_inst.window.close();
+        });
 
-            Chart.setDatasetProp(checkbox.value,DotSelector.value);
+        //----------кнопка отмена
+        Chart_Config_PopUp_inst.chartSetOCA.cancel.addEventListener("click", ()=>{
+            Chart_Config_PopUp_inst.window.close();
+        });
 
-            Chart.setDatasetProp(checkbox.value,`borderWidth=${LineWidthInput.value}`);
-
-            Chart.setDatasetProp(checkbox.value,`tension=${range_TrendTension.value/100}`);
-        }
-    })
-
-    //общие настройки
-    Chart.setOptionsProp('!background='+borderColor_Background);
-
-    //настройки оси x
-    Chart.setOptionsProp('scales=x=timeRangeSelector='+XScaleTimeRangeSettings.timeRangeSelector.value);
-
-    switch (XScaleTimeRangeSettings.timeRangeSelector.value) {
-        case '1':
-            Chart.setOptionsProp('scales=x=min='+DateTime.StringToDCS(XScaleTimeRangeSettings.startTimeInput.value));
-            Chart.setOptionsProp('scales=x=timeRangeItemSelect='+XScaleTimeRangeSettings.timeRangeItemSelect.value);
-            Chart.setOptionsProp('scales=x=timeRangeInput='+XScaleTimeRangeSettings.timeRangeInput.value);
-            break;
-        case '2':
-            Chart.setOptionsProp('scales=x=min='+DateTime.StringToDCS(XScaleTimeRangeSettings.startTimeInput.value));
-            Chart.setOptionsProp('scales=x=max='+DateTime.StringToDCS(XScaleTimeRangeSettings.endTimeInput.value));
-            break;
-        case '3':
-            Chart.setOptionsProp('scales=x=max='+XScaleTimeRangeSettings.pointAmount.value);
-            break;
+        return this;
     }
 
-    Chart.setOptionsProp('scales=x=ticks=color='+borderColor_Xscales);
+    //функция применения настроек
+    acceptSettings=()=>{
+        //настройки трендов
+        //проходим по выбраным трендам
+        let Tab1=new Chart_Config_tab1();
+        Tab1.checkBoxArr.forEach((checkbox)=>{
+            if(checkbox.checked==true){
 
-    Chart.setOptionsProp('scales=x=border=color='+borderColor_XScaleline);
-    Chart.setOptionsProp('scales=x=border=width='+XScalelineWidth.value);
+                Chart.setDatasetProp(checkbox.value,`yAxisID=${Tab1.valueAxisList.value}`);
 
-    Chart.setOptionsProp('scales=x=grid=color='+borderColor_XScaleGrid);
-    Chart.setOptionsProp('scales=x=grid=lineWidth='+XScaleGridWidth.value);
+                Chart.setDatasetProp(checkbox.value,Tab1.select_TrendType.value);
 
-    //настройки осей y
-    let yScaleName;
-    for(let yScaleCBox of YscaleList.checkBoxes){
-        if(yScaleCBox.checked){
-            yScaleName=yScaleCBox.value;
+                Chart.setDatasetProp(checkbox.value,`borderColor=${Tab1.borderColor_trends}`);
+                Chart.setDatasetProp(checkbox.value,`backgroundColor=${Tab1.borderColor_trends+'7F'}`);
 
-            Chart.setOptionsProp(`scales=${yScaleName}=name=${YscaleNameInput.value}`);
+                
+                Chart.setDatasetProp(checkbox.value,`fill=${Tab1.checkbox_Filled.checked}`);
 
-            Chart.setOptionsProp(`scales=${yScaleName}=title=text=${YscaleTitleInput.value}`);
+                Chart.setDatasetProp(checkbox.value,Tab1.dotSelector.value);
 
-            Chart.setOptionsProp(`scales=${yScaleName}=max=${YscaleTo_input.value}`);
-            Chart.setOptionsProp(`scales=${yScaleName}=min=${YscaleFrom_input.value}`);
+                Chart.setDatasetProp(checkbox.value,`borderWidth=${Tab1.lineWidthInput.value}`);
 
-            Chart.setOptionsProp(`scales=${yScaleName}=position=${YscalePosSelector.value}`);
+                Chart.setDatasetProp(checkbox.value,`tension=${Tab1.range_TrendTension.value/100}`);
+            }
+        })
 
-            Chart.setOptionsProp(`scales=${yScaleName}=ticks=color=${borderColor_Yscales}`);
+        //общие настройки
+        let Tab2=new Chart_Config_tab2();
+        Chart.setOptionsProp('!background='+Tab2.borderColor_Background);
 
-            Chart.setOptionsProp(`scales=${yScaleName}=border=color=${borderColor_YScaleline}`);
-            Chart.setOptionsProp(`scales=${yScaleName}=border=width=${YScalelineWidth.value}`);
+        //настройки оси x
+        let Tab3=new Chart_Config_tab3();
+        Chart.setOptionsProp('scales=x=timeRangeSelector='+Tab3.confTimeRangeArea.timeRangeSelector.value);
 
-            Chart.setOptionsProp(`scales=${yScaleName}=grid=color=${borderColor_YScaleGrid}`);
-            Chart.setOptionsProp(`scales=${yScaleName}=grid=lineWidth=${YScaleGridWidth.value}`);
+        switch (Tab3.confTimeRangeArea.timeRangeSelector.value) {
+            case '1':
+                Chart.setOptionsProp('scales=x=min='+DateTime.StringToDCS(Tab3.confTimeRangeArea.startTimeInput.value));
+                Chart.setOptionsProp('scales=x=timeRangeItemSelect='+Tab3.confTimeRangeArea.timeRangeItemSelect.value);
+                Chart.setOptionsProp('scales=x=timeRangeInput='+Tab3.confTimeRangeArea.timeRangeInput.value);
+                break;
+            case '2':
+                Chart.setOptionsProp('scales=x=min='+DateTime.StringToDCS(Tab3.confTimeRangeArea.startTimeInput.value));
+                Chart.setOptionsProp('scales=x=max='+DateTime.StringToDCS(Tab3.confTimeRangeArea.endTimeInput.value));
+                break;
+            case '3':
+                Chart.setOptionsProp('scales=x=max='+Tab3.confTimeRangeArea.pointAmount.value);
+                break;
         }
-    }
 
-    //
-    YscaleNameListBuild();
+        Chart.setOptionsProp('scales=x=ticks=color='+Tab3.borderColor_Xscales);
 
-    chartContainer.style.backgroundColor=Chart.getOptionsProp('background',0);
-    Chart.chart.update(); 
-}   
+        Chart.setOptionsProp('scales=x=border=color='+Tab3.borderColor_XScaleline);
+        Chart.setOptionsProp('scales=x=border=width='+Tab3.xScalelineWidth.value);
+
+        Chart.setOptionsProp('scales=x=grid=color='+Tab3.borderColor_XScaleGrid);
+        Chart.setOptionsProp('scales=x=grid=lineWidth='+Tab3.xScaleGridWidth.value);
+
+        //настройки осей y
+        let Tab4=new Chart_Config_tab4();
+        let yScaleName;
+        for(let yScaleCBox of Tab4.yScaleList.checkBoxes){
+            if(yScaleCBox.checked){
+                yScaleName=yScaleCBox.value;
+
+                Chart.setOptionsProp(`scales=${yScaleName}=name=${Tab4.yScaleNameInput.value}`);
+
+                Chart.setOptionsProp(`scales=${yScaleName}=title=text=${Tab4.yScaleTitleInput.value}`);
+
+                Chart.setOptionsProp(`scales=${yScaleName}=max=${Tab4.yScaleTo_input.value}`);
+                Chart.setOptionsProp(`scales=${yScaleName}=min=${Tab4.yScaleFrom_input.value}`);
+
+                Chart.setOptionsProp(`scales=${yScaleName}=position=${Tab4.yScalePosSelector.value}`);
+
+                Chart.setOptionsProp(`scales=${yScaleName}=ticks=color=${Tab4.borderColor_Yscales}`);
+
+                Chart.setOptionsProp(`scales=${yScaleName}=border=color=${Tab4.borderColor_YScaleline}`);
+                Chart.setOptionsProp(`scales=${yScaleName}=border=width=${Tab4.yScalelineWidth.value}`);
+
+                Chart.setOptionsProp(`scales=${yScaleName}=grid=color=${Tab4.borderColor_YScaleGrid}`);
+                Chart.setOptionsProp(`scales=${yScaleName}=grid=lineWidth=${Tab4.yScaleGridWidth.value}`);
+            }
+        }
+
+        //
+        Tab4.YscaleNameListBuild();
+
+        chartContainer.style.backgroundColor=Chart.getOptionsProp('background',0);
+        Chart.chart.update(); 
+    }   
+
+}
 
 
-//----------кнопка применить
-chartSetOCA.accept.addEventListener("click", ()=>{
-    acceptSettings();
-});
 
-//----------кнопка ок
-chartSetOCA.ok.addEventListener("click", ()=>{
-    acceptSettings();
-    ChartSettingsPopUp.close();
-});
-
-//----------кнопка отмена
-chartSetOCA.cancel.addEventListener("click", ()=>{
-    ChartSettingsPopUp.close();
-});
 

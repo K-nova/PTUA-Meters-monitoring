@@ -4,6 +4,8 @@ import {MeterSettingsContent} from "./MeterSettingsContent.js";
 import {TrainingMessage} from "./TrainingMessage.js";
 import {Cover} from "./Cover.js";
 import {OkCancelAccept} from "./OkCancelAccept.js";
+import {Loader} from "./Loader.js";
+import {LoaderType2} from "./LoaderType2.js";
 
 export var PageElements={
    
@@ -390,5 +392,9 @@ export var PageElements={
 
     Cover:Cover,
 
-    OkCancelAccept:OkCancelAccept
+    OkCancelAccept:OkCancelAccept,
+
+    Loader:Loader,
+
+    LoaderType2:LoaderType2
 }

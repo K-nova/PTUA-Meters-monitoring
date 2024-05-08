@@ -8,6 +8,7 @@ export class ServDataExchangeSim{
     #TREE_DATA_SORAGE_NAME='treeDataLocStorageName';
     #NO_CHANGES=ServerDataExchange.NO_CHANGES;
     #ERR_NAMEALREADYEXIST=ServerDataExchange.ERR_NAMEALREADYEXIST;
+    #TIME_DELAY=500;
 
     //структура симулированного обмена данными
     #simDataFromServer={
@@ -129,33 +130,43 @@ export class ServDataExchangeSim{
 
     //получить данные по структуре дерева
     getTreeStructureData=()=>{
-        let result;
-        
-        //функция добавления стандартныйх настроек счетчика во все объекты
-        let addMeterSettingsF=function(items){
-            for(let item of items){
-                if('children' in item){
-                    addMeterSettingsF(item.children);
-                }else{
-                    if(!('meterSettings' in item) && (item.type!='folder')){
-                        item.meterSettings=meterSetting;
+        return new Promise((resolve, reject)=>{
+            let result;
+    
+            //имитируем задержку, необходимую для загрузки данных
+            setTimeout(()=>{
+                //функция создания данных
+    
+                //функция добавления стандартныйх настроек счетчика во все объекты
+                let addMeterSettingsF=function(items){
+                    for(let item of items){
+                        if('children' in item){
+                            addMeterSettingsF(item.children);
+                        }else{
+                            if(!('meterSettings' in item) && (item.type!='folder')){
+                                item.meterSettings=meterSetting;
+                            }
+                        }
                     }
                 }
-            }
-        }
-        //делаем запрос из локальной сессии
-        result=JSON.parse(sessionStorage.getItem(locStorName(this.#TREE_DATA_SORAGE_NAME)));
-        //если данных в сессии нет
-        if(!(result instanceof Object)){
-            result= defSimTreeData;
-            //добавляем стандартные настройки счетчика
-            addMeterSettingsF(result);
-            //сохраняем данные в локальной сессии
-            sessionStorage.setItem(locStorName(this.#TREE_DATA_SORAGE_NAME),JSON.stringify(result) );
-        }
-              
-         return result;
+                //делаем запрос из локальной сессии
+                result=JSON.parse(sessionStorage.getItem(locStorName(this.#TREE_DATA_SORAGE_NAME)));
+                //если данных в сессии нет
+                if(!(result instanceof Object)){
+                    result= defSimTreeData;
+                    //добавляем стандартные настройки счетчика
+                    addMeterSettingsF(result);
+                    //сохраняем данные в локальной сессии
+                    sessionStorage.setItem(locStorName(this.#TREE_DATA_SORAGE_NAME),JSON.stringify(result) );
+                }
+    
+                resolve(result);
+                
+            }, this.#TIME_DELAY)
+         
+        })
     }
+    
 
     //получить настройки счетчика
     getMeterSettings=(idPath)=>{
@@ -180,119 +191,126 @@ export class ServDataExchangeSim{
 
     //получить данные по графику
     getChartData=(idPath,timeRange)=>{
-        
-        let result;
+        return new Promise((resolve, reject)=>{
+            let result;
 
-        let LenghtRange=0;
-        let startTime, startTimeUnix;
-        let endTime;
+            //имитируем задержку, необходимую для загрузки данных
+            setTimeout(()=>{
+                let LenghtRange=0;
+                let startTime, startTimeUnix;
+                let endTime;
 
-        let currentTime=new Date()
-        let prevTimeStamp={idPath:idPath, timeStamp: new Date(0)};
-        let dataExchangePeriod=0;
-        let timeDiff=0;
-        let timeIntervalReached=false;
-            
-        //------тип заданного диапазона
-        switch (timeRange.type.toString()) {
-            case '1'://начальное+временный диапазон
-                startTime=timeRange.firstValue;
-                startTimeUnix=new Date(timeRange.firstValue).getTime();
+                let currentTime=new Date()
+                let prevTimeStamp={idPath:idPath, timeStamp: new Date(0)};
+                let dataExchangePeriod=0;
+                let timeDiff=0;
+                let timeIntervalReached=false;
+                    
+                //------тип заданного диапазона
+                switch (timeRange.type.toString()) {
+                    case '1'://начальное+временный диапазон
+                        startTime=timeRange.firstValue;
+                        startTimeUnix=new Date(timeRange.firstValue).getTime();
 
-                LenghtRange=(timeRange.secondValue[0]*timeRange.secondValue[1])/1000; 
-                endTime=new Date(startTimeUnix+LenghtRange);
+                        LenghtRange=(timeRange.secondValue[0]*timeRange.secondValue[1])/1000; 
+                        endTime=new Date(startTimeUnix+LenghtRange);
 
-                break;
-            case '2': //начальное/конечное время
-                startTime=timeRange.firstValue;
-                startTimeUnix=new Date(timeRange.firstValue).getTime();
-                
+                        break;
+                    case '2': //начальное/конечное время
+                        startTime=timeRange.firstValue;
+                        startTimeUnix=new Date(timeRange.firstValue).getTime();
+                        
 
-                endTime=timeRange.secondValue;
-                LenghtRange=(new Date(timeRange.secondValue).getTime()-startTimeUnix)/1000; 
-                break;
-        }
-
-        //------получаем данные по счетчику
-        let meterSettingsData=this.getMeterSettings(idPath);
-
-        //------предыдущая временная метка
-        //ищем или создаем временную метку предыдущих данных
-        let timeStampFound=false;
-        for(let simPrevExchangeTimeStamp of this.#simPrevExchangeTimeStamps){
-            if(simPrevExchangeTimeStamp.idPath==idPath){
-                prevTimeStamp=simPrevExchangeTimeStamp;
-                timeStampFound=true;
-            }
-        }
-
-        if(!timeStampFound){
-            this.#simPrevExchangeTimeStamps.push(prevTimeStamp);
-        }
-        
-        
-    
-        //определяем прошло ли соответсвующее время
-        timeDiff=currentTime.getTime()-prevTimeStamp.timeStamp.getTime();
-        dataExchangePeriod=meterSettingsData.exchangeTimeValue*meterSettingsData.exchangeTimeType;
-        timeIntervalReached=timeDiff>=dataExchangePeriod;
-        
-        //обновляем временную метку
-        if(timeIntervalReached){
-            prevTimeStamp.timeStamp=currentTime;
-            
-        }
-
-        
-        //-----формируем значения
-        if(timeIntervalReached){
-            if(LenghtRange*1000<dataExchangePeriod){
-                LenghtRange=1;
-            }
-            //цикл опроса счетчика завершен
-            if(this.#simDataFromServer.XPoints[this.#simDataFromServer.XPoints.length - 1]!=endTime){
-                //обнуляем массив временных меток
-                this.#simDataFromServer.XPoints=[];
-                //обнуляем массив значений по каждому тренду
-                for(let i=0; i< this.#simDataFromServer.Trends.length; i++){
-                    this.#simDataFromServer.Trends[i].Points=[];
+                        endTime=timeRange.secondValue;
+                        LenghtRange=(new Date(timeRange.secondValue).getTime()-startTimeUnix)/1000; 
+                        break;
                 }
 
-                //добавляем значения
-                for (let i = 0; i < LenghtRange; i++) {
+                //------получаем данные по счетчику
+                let meterSettingsData=this.getMeterSettings(idPath);
 
-                    //добавляем временнные метки
-                    currentTime.setTime(startTimeUnix+i*1000);
-                    this.#simDataFromServer.XPoints[i]=currentTime.getTime();
-
-                    //добавляем значения
-                    for(let trendSetpoint of trendSetpoints){
-                        for(let sti=0; sti<this.#simDataFromServer.Trends.length; sti++){
-                            if(this.#simDataFromServer.Trends[sti].Name==trendSetpoint.name){
-                                //если опрос счетчика активирован
-                                if(meterSettingsData.dataExchange[sti].active){
-                                    this.#simDataFromServer.Trends[sti].Points[i]=
-                                    Math.random() * this.#simTrendRndDisturbance[sti] + this.#simTrendRndLevles[sti];
-                                //если опрос счетчика не активирован
-                                }else{
-                                    this.#simDataFromServer.Trends[sti].Points[i]=0;
-                                }
-                                
-                            }
-                        }
+                //------предыдущая временная метка
+                //ищем или создаем временную метку предыдущих данных
+                let timeStampFound=false;
+                for(let simPrevExchangeTimeStamp of this.#simPrevExchangeTimeStamps){
+                    if(simPrevExchangeTimeStamp.idPath==idPath){
+                        prevTimeStamp=simPrevExchangeTimeStamp;
+                        timeStampFound=true;
                     }
                 }
+
+                if(!timeStampFound){
+                    this.#simPrevExchangeTimeStamps.push(prevTimeStamp);
+                }
                 
-            }
+                
+            
+                //определяем прошло ли соответсвующее время
+                timeDiff=currentTime.getTime()-prevTimeStamp.timeStamp.getTime();
+                dataExchangePeriod=meterSettingsData.exchangeTimeValue*meterSettingsData.exchangeTimeType;
+                timeIntervalReached=timeDiff>=dataExchangePeriod;
+                
+                //обновляем временную метку
+                if(timeIntervalReached){
+                    prevTimeStamp.timeStamp=currentTime;
+                    
+                }
+
+                
+                //-----формируем значения
+                if(timeIntervalReached){
+                    if(LenghtRange*1000<dataExchangePeriod){
+                        LenghtRange=1;
+                    }
+                    //цикл опроса счетчика завершен
+                    if(this.#simDataFromServer.XPoints[this.#simDataFromServer.XPoints.length - 1]!=endTime){
+                        //обнуляем массив временных меток
+                        this.#simDataFromServer.XPoints=[];
+                        //обнуляем массив значений по каждому тренду
+                        for(let i=0; i< this.#simDataFromServer.Trends.length; i++){
+                            this.#simDataFromServer.Trends[i].Points=[];
+                        }
+
+                        //добавляем значения
+                        for (let i = 0; i < LenghtRange; i++) {
+
+                            //добавляем временнные метки
+                            currentTime.setTime(startTimeUnix+i*1000);
+                            this.#simDataFromServer.XPoints[i]=currentTime.getTime();
+
+                            //добавляем значения
+                            for(let trendSetpoint of trendSetpoints){
+                                for(let sti=0; sti<this.#simDataFromServer.Trends.length; sti++){
+                                    if(this.#simDataFromServer.Trends[sti].Name==trendSetpoint.name){
+                                        //если опрос счетчика активирован
+                                        if(meterSettingsData.dataExchange[sti].active){
+                                            this.#simDataFromServer.Trends[sti].Points[i]=
+                                            Math.random() * this.#simTrendRndDisturbance[sti] + this.#simTrendRndLevles[sti];
+                                        //если опрос счетчика не активирован
+                                        }else{
+                                            this.#simDataFromServer.Trends[sti].Points[i]=0;
+                                        }
+                                        
+                                    }
+                                }
+                            }
+                        }
+                        
+                    }
+                
+                    result=this.#simDataFromServer;
+                }
+                //цикл опроса счетчика не завершен
+                else{
+                    result=this.#NO_CHANGES; 
+                }
+
+                //результат Promise
+                resolve(result);
+
+            }, this.#TIME_DELAY);       
+        })
         
-            result=this.#simDataFromServer;
-        }
-        //цикл опроса счетчика не завершен
-        else{
-            result=this.#NO_CHANGES; 
-        }
-        
-        return  result;
     }
 
     //добавить в струкутуру дерева данные элкемента

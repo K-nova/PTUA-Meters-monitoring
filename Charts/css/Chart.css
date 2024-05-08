@@ -27,6 +27,12 @@
     height: 100%;
 }
 
+/**/
+.chart_statusBar{
+    min-height: 1.5em;
+    border: solid 1px;
+}
+
 /*tab content*/
 
 

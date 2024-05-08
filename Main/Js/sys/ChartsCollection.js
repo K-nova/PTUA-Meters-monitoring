@@ -9,6 +9,7 @@ export class ChartsCollection{
     container;
 
     tree;
+    treeLoader;
     treePlaceholder;
     treeData;
     treeTrainingMsg;
@@ -128,18 +129,17 @@ export class ChartsCollection{
         })
 
         //----создаем дерево и заполняем воркспейс
-        this.construct();
-
-        //------------training messages
-        this.#treeTrainingMsgs();
-        
+        this.construct(true);
+   
     };
 
     //cоздаем дерево и заполняем воркспейс
-    construct=()=>{
+    async construct(trainingMsg=false){
         //запрос данных с сервера
-        this.treeData=ServerDataExchange.getTreeStructureData();
-        this.#createParentData(this.treeData, this.treeData, true);
+        this.treeLoader=new PageElements.Loader(this.tree);
+        this.treeData=await ServerDataExchange.getTreeStructureData();
+        this.treeLoader.hide();
+        this.#createParentData(this.treeData, this.tree, true);
 
         //постройка данных дерева
         this.#createTree(this.tree, this.treeData, '', 20, true);
@@ -153,19 +153,11 @@ export class ChartsCollection{
         //установить функционал кнопки "вверх"
         this.#setWsUpButtonFunc();
 
-    }
+        //тренировочные сообщения
+        if(trainingMsg){
+            this.#treeTrainingMsgs();
+        }
 
-    //заполняем воркспейс
-    constructWS=()=>{
-        //запрос данных с сервера
-        this.treeData=ServerDataExchange.getTreeStructureData();
-        this.#createParentData(this.treeData, this.treeData, true);
-
-        //открыть экран воркспейса
-        this.openByPath(this.#getPrevPath()); 
-
-        //установить функционал кнопки "вверх"
-        this.#setWsUpButtonFunc();
     }
     
     //функция добавления родительских данных в данные по графикам
@@ -324,7 +316,7 @@ export class ChartsCollection{
                             dataItem.text=treeButton.value;
                         }
                         
-                        //this.constructWS();
+                       
                     }
                 })
             }
