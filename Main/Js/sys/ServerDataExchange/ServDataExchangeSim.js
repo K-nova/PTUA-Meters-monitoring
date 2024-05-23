@@ -488,7 +488,7 @@ export class ServDataExchangeSim{
         for(let id of ids){
             i++;
             for(let targetFolder of targetFolders){
-                if(targetFolder.Id==id){
+                if(targetFolder.id==id){
                     if(i<ids.length){
                         targetFolders=targetFolder.children; 
                     }else{

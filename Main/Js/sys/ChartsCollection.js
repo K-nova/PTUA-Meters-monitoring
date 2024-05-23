@@ -195,7 +195,7 @@ export class ChartsCollection{
                 let treeInput=document.createElement('input');
                 treeInput.className='tree-input';
                 treeInput.type='checkbox';
-                treeInput.id=`tree-input${treeInputIdSuf+'-'+dataItem.Id}`;
+                treeInput.id=`tree-input${treeInputIdSuf+'-'+dataItem.id}`;
                 treeItem.appendChild(treeInput);
                 treeInput.addEventListener('change',(event)=>{
                     if(event.target.checked){
@@ -267,7 +267,7 @@ export class ChartsCollection{
 
                 //создаем вложенный контент
                     let nextLevPaddingLeft=paddingLeft+10;
-                    let nextTreeInputIdSuf =treeInputIdSuf+'-'+dataItem.Id;
+                    let nextTreeInputIdSuf =treeInputIdSuf+'-'+dataItem.id;
                     if('children' in dataItem){
                          this.#createTree(treeItemContent,dataItem.children,nextTreeInputIdSuf, nextLevPaddingLeft);
                     }
@@ -339,10 +339,10 @@ export class ChartsCollection{
             }
             //загружаем график
             else{
-                if(contentData.ChartType=='line' || contentData.ChartType==undefined){
+                if(contentData.chartType=='line' || contentData.chartType==undefined){
                     this.#setChartInWorkspace(); 
                 }else{
-                    this.#setDemoChartInWorkspace(contentData.ChartType);  
+                    this.#setDemoChartInWorkspace(contentData.chartType);  
                 }
                                       
             }
@@ -439,7 +439,7 @@ export class ChartsCollection{
                 }
                 //рисунок кнопки обзора -график
                 else{
-                    switch (dataItem.ChartType) {
+                    switch (dataItem.chartType) {
                         case 'line':
                             img.src="Data/line-chart-icon.png";
                             break;
@@ -623,7 +623,7 @@ export class ChartsCollection{
 
         //--устанавливаем начальные значения
         let wsSubheaderText=contentData.text;
-        let idPath=contentData.Id;
+        let idPath=contentData.id;
         let name=contentData.text;
         let path='';
         
@@ -633,7 +633,7 @@ export class ChartsCollection{
             let parent=contentData.parent;
             if(!contentData.root){
                 wsSubheaderText=parent.text+'/'+wsSubheaderText;
-                idPath=parent.Id+'/'+idPath;
+                idPath=parent.id+'/'+idPath;
                 path=parent.text+'/'+path;
                 treeDataIteration.call(this,parent);
             }
@@ -690,17 +690,17 @@ export class ChartsCollection{
         let contentData;
         
         //функция итерации id
-        let idIteration=function(pathIds, treeData){
+        let idIteration=(pathIds, treeData)=>{
             let result;
 
             //находим соответствующий id в 
             for(let treeDataItem of treeData){
-                if(pathIds[0]==treeDataItem.Id){
+                if(pathIds[0]==treeDataItem.id){
                     
                     //переход на один уровень вниз
                     if(pathIds.length>1){
                         pathIds.shift();
-                        result=idIteration.call(this, pathIds, treeDataItem.children);
+                        result=idIteration(pathIds, treeDataItem.children);
                     }
                     //возврат текущего уровня
                     else{
@@ -716,7 +716,7 @@ export class ChartsCollection{
         
         if(Array.isArray(pathIds) && pathIds.length>0){
             //вызыываем функцию итерации
-            contentData=idIteration.call(this, pathIds, this.treeData);
+            contentData=idIteration(pathIds, this.treeData);
             
             //открываем соответсвующий экран в воркспейсе
             this.#setContent(contentData); 
