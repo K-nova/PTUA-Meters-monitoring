@@ -1,0 +1,59 @@
+/*--------trainingMessage--------*/
+.trainingMessage{
+    display: block;
+    position: absolute;
+  
+    background-color: rgba(255, 255, 255, 0.0);
+  
+    z-index: 1;
+  
+    transform: translateY(0%) scale(0);
+    transition: .4s ease-in-out;
+  }
+  
+  .trainingMessage.active{
+    transform:  translateY(0%) scale(100%);
+  }
+  
+  .trainingMessageArrowWrapper{
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .trainingMessageArrowWrapper.left{
+    justify-content: flex-end;
+  }
+  
+  .trainingMessageArrow{
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 0 17px 29.4px 17px;
+    border-color: transparent transparent gold transparent;
+    transform: rotate(0deg);
+  }
+  
+  .trainingMessageArrowDown{
+    width: 0px;
+    height: 0px;
+    border-style: solid;
+    border-width: 0 17px 29.4px 17px;
+    border-color: transparent transparent gold transparent;
+    transform: rotate(180deg);
+  }
+  
+  .trainingMessageWindow{
+    background-color: gold;
+  }
+  
+  .trainingMessageHeader{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: 100%;
+  }
+  
+  .trainingMessageContent{
+    margin-left: 1em;
+    margin-right: 1em;
+  }

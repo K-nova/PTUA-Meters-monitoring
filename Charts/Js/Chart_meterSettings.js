@@ -6,7 +6,7 @@ import {TrainingMessages} from "../../Main/Js/sys/TrainingMessages.js";
 import {forChartPageData, chartCover_zIndex, TrainingMessagesC, cover, workspace_iframe} from "./Chart-1.js";
 
 
-export class Chart_meterSetiings{
+export class Chart_meterSettings{
 
     TrainingMsg;
 
@@ -16,10 +16,11 @@ export class Chart_meterSetiings{
     }
 
     //
-    #mainConstruct=()=>{
+    async #mainConstruct(){
         //изменение родительского экрана
-        let meterSettings_checkbox=document.querySelector('#meterSettings_checkbox');
-        let meterSettingsWrap=document.querySelector('#meterSettingsWrap');
+        let MeterSettingsAccordion=new PageElements.Accordion(document.querySelector('#accordionWrapper'),'meterSettings', 'Настройки счетчика');
+        let meterSettings_checkbox=MeterSettingsAccordion.ctrlElement;
+        let meterSettingsWrap=MeterSettingsAccordion.content;
 
         let ws_iframe_heightInit;
         meterSettings_checkbox.addEventListener('click',()=>{
@@ -33,7 +34,14 @@ export class Chart_meterSetiings{
 
         //
         let MeterSetting=new PageElements.MeterSettingsContent(meterSettingsWrap);
-        let meterSettingsData=ServerDataExchange.getMeterSettings(forChartPageData.idPath);
+
+        //загружаем данные
+        let meterSettings_accItem=MeterSettingsAccordion.item;
+        let meterSettingsLoader=new PageElements.LoaderType2(MeterSettingsAccordion.labelAdditional);
+        meterSettingsLoader.invertColor();
+        meterSettingsLoader.show();
+        let meterSettingsData=await ServerDataExchange.getMeterSettings(forChartPageData.idPath);
+        meterSettingsLoader.hide();
 
         //область Общее
         MeterSetting.mSArea1.input_meter_path.value=forChartPageData.path;
@@ -68,7 +76,7 @@ export class Chart_meterSetiings{
         MeterSetting.mSArea3.subArea2.column3.select.value=meterSettingsData.exchangeTimeType;
 
         //функция применить
-        let meterSettingApply=()=>{
+        async function meterSettingApply(){
             //формируем данные настройки счетчика
             let setMeterData={text:{}, meterSettings:{}};
             //общее
@@ -110,13 +118,15 @@ export class Chart_meterSetiings{
             setMeterData.meterSettings.exchangeTimeType=MeterSetting.mSArea3.subArea2.column3.select.value;
 
             //команда изменения данных счетчика на сервере
-            
-            let setMeterResponse=ServerDataExchange.setMeterSettings({
+            meterSettingsLoader.show();
+            let setMeterResponse=await ServerDataExchange.setMeterSettings({
                 idPath:forChartPageData.idPath,
                 text:setMeterData.text,
                 meterSettings:setMeterData.meterSettings
 
             })
+            meterSettingsLoader.hide();
+
             if(setMeterResponse.err){
                 if(setMeterResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
                     MeterSetting.addNameErr('Такое имя уже существует в данной папке!');          
@@ -127,13 +137,13 @@ export class Chart_meterSetiings{
 
         //кнопки ок/отмена/применить
         MeterSetting.okCancelAccept.accept.addEventListener('click',()=>{
-            meterSettingApply();
+            meterSettingApply.call(this);
         });
         MeterSetting.okCancelAccept.hide('ok');
         MeterSetting.okCancelAccept.hide('cancel');
 
         //training messages
-        let meterSettingsALabel=document.querySelector('#meterSettingsALabel');
+        let meterSettingsALabel=MeterSettingsAccordion.label;
 
         this.TrainingMsg=new TrainingMessages('meterSettings',[
             {target:MeterSetting.mSArea3.subArea1.column1.cbList.checkBoxes[0], text:'установите, или отмените опрос счетчика. При выключенном опросе значения будут равнятся нулю'},

@@ -7,7 +7,7 @@ import {PageElements} from "../../Main/Js/sys/PageElements/PageElements.js";
 import {ServerDataExchange} from "../../Main/Js/sys/ServerDataExchange/ServerDataExchange.js";
 import {TrainingMessages} from "../../Main/Js/sys/TrainingMessages.js";
 
-import {Chart_meterSetiings} from "./Chart_meterSettings.js";
+import {Chart_meterSettings} from "./Chart_meterSettings.js";
 
 import {Chart_Config_PopUp} from "./Chart_Config_PopUp.js";
 import {Chart_Config_tab1} from "./Chart_Config_tab1.js";
@@ -42,7 +42,7 @@ async function chartFunction(){
     forChartPageData=JSON.parse(sessionStorage.getItem(locStorName(ChartsCollection.FOR_CHART_PAGE_STORAGENAME)));
 
     //------------область настроек счетчика
-    let Chart_meterSetiingsInst= new Chart_meterSetiings();
+    let Chart_meterSetiingsInst= new Chart_meterSettings();
 
     //------диаграмма
     //Определяем тип диаграммы
@@ -72,7 +72,7 @@ async function chartFunction(){
         chartLoader.show();
 
         let DataFromServer=
-        await ServerDataExchange.GetChartData(forChartPageData.idPath,
+        await ServerDataExchange.getChartData(forChartPageData.idPath,
         {
             type:type,
             firstValue:firstVal,
@@ -150,7 +150,7 @@ async function chartFunction(){
             chartLoader.show();
             //запрашиваем данные
             let dataFromServerForUpdate=
-            await ServerDataExchange.GetChartData(forChartPageData.idPath,
+            await ServerDataExchange.getChartData(forChartPageData.idPath,
             {
                 type:'1',
                 firstValue:firstVal,

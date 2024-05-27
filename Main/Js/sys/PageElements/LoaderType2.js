@@ -43,7 +43,11 @@ export let LoaderType2=class{
 
     delete=()=>{
         this.parent.removeChild(this.loader);
-    }    
+    }   
+    
+    invertColor=()=>{
+        this.loader.classList.toggle('invColor');
+    }
 
     
 

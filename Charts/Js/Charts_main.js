@@ -48,14 +48,17 @@ let AddFolder2Content=new PageElements.AddFolderContent(ChartColl.addFolder2PopU
 let addFolderPopUpLogic=function(content, popUp){
     let acceptDone=false;
     //функция применить
-    let meterSettingApply=()=>{
+    async function meterSettingApply(){
         //команда добавляения данных счетчика на сервер
-        let addFolderResponse=ServerDataExchange.addItem({
+        ChartColl.treeLoader.show();
+        let addFolderResponse=await ServerDataExchange.addItem({
             idPath:ChartColl.mouseFTreeMenuEventPath.idPath,
             text:content.addFolderNameInput.value || content.addFolderNameInput.placeholder,
             type: 'folder'
         });
+        ChartColl.treeLoader.hide();
 
+        //анализируем ответ сервера
         if(!addFolderResponse.err){
             //пересобираем дерево и воркспейс
             ChartColl.construct();
@@ -69,14 +72,18 @@ let addFolderPopUpLogic=function(content, popUp){
             acceptDone=false;
         }
 
-
     }
 
     //кнопки ок/отмена/применить
     content.okCancelAccept.ok.addEventListener('click',()=>{
-        acceptDone=false;
-        meterSettingApply();
-        if(acceptDone){popUp.close();}
+        async function okClick(){
+            acceptDone=false;
+            await meterSettingApply.call(this);
+            if(acceptDone){popUp.close();}
+        }
+
+        okClick();
+        
     })
 
     content.okCancelAccept.cancel.addEventListener('click',()=>{
@@ -101,7 +108,7 @@ ChartColl.addMeterPopUp.calllButton.addEventListener("click", ()=>{
 })
 
 //функция применить
-let meterSettingApply=()=>{
+async function meterSettingApply(){
     //формируем данные настройки счетчика
     let meterSettings={};
     meterSettings.ip=[];
@@ -141,7 +148,7 @@ let meterSettingApply=()=>{
 
     //команда добавляения данных счетчика на сервер
     
-    let addMeterResponse=ServerDataExchange.addItem({
+    let addMeterResponse=await ServerDataExchange.addItem({
         idPath:ChartColl.mouseFTreeMenuEventPath.idPath,
         text:MeterSettingsContent.mSArea1.input_meter_name.value ||
         MeterSettingsContent.mSArea1.input_meter_name.placeholder,

@@ -6,6 +6,7 @@ import {Cover} from "./Cover.js";
 import {OkCancelAccept} from "./OkCancelAccept.js";
 import {Loader} from "./Loader.js";
 import {LoaderType2} from "./LoaderType2.js";
+import {Accordion} from "./Accordion.js";
 
 export var PageElements={
    
@@ -396,5 +397,7 @@ export var PageElements={
 
     Loader:Loader,
 
-    LoaderType2:LoaderType2
+    LoaderType2:LoaderType2,
+
+    Accordion:Accordion
 }

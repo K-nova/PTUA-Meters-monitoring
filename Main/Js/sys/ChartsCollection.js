@@ -91,11 +91,15 @@ export class ChartsCollection{
         //удалить
         this.mouseFTreeMenuContent[3].addEventListener('click', ()=>{
             if(confirm('удалить')){
-                //запрос серверу на удаление данных
-                ServerDataExchange.deleteItem(this.mouseFTreeMenuEventPath.idPath);
+                async function deleteItem(){
+                    //запрос серверу на удаление данных
+                    await ServerDataExchange.deleteItem(this.mouseFTreeMenuEventPath.idPath);
 
-                //cоздаем дерево и заполняем воркспейс
-                this.construct();
+                    //cоздаем дерево и заполняем воркспейс
+                    this.construct();
+                }
+                
+                deleteItem.call(this);
 
             }
                  
@@ -118,11 +122,15 @@ export class ChartsCollection{
         //*удалить
         this.mouseMTreeMenuContent[1].addEventListener('click', ()=>{
             if(confirm('удалить')){
-                //запрос серверу на удаление данных
-                ServerDataExchange.deleteItem(this.mouseMTreeMenuEventPath.idPath);
+                async function deleteItem(){
+                    //запрос серверу на удаление данных
+                    await ServerDataExchange.deleteItem(this.mouseMTreeMenuEventPath.idPath);
 
-                //cоздаем дерево и заполняем воркспейс
-                this.construct();
+                    //cоздаем дерево и заполняем воркспейс
+                    this.construct();
+                }
+                
+                deleteItem.call(this);
 
             }
                  
@@ -231,23 +239,26 @@ export class ChartsCollection{
                 })
                 treeLabel.addEventListener('blur',(event)=>{
                     if(treeLabel.onEdit){
-                        treeLabel.className='tree-title';
-                        treeLabel.setAttribute('readonly', 'true');
-                        treeLabel.onEdit=false;
-                        let renameItemResponse=ServerDataExchange.renameItem({
-                            idPath:this.mouseFTreeMenuEventPath.idPath,
-                            text: treeLabel.value
-                        });
+                        async function treeLabelBlur(){
+                            treeLabel.className='tree-title';
+                            treeLabel.setAttribute('readonly', 'true');
+                            treeLabel.onEdit=false;
+                            let renameItemResponse=await ServerDataExchange.renameItem({
+                                idPath:this.mouseFTreeMenuEventPath.idPath,
+                                text: treeLabel.value
+                            });
 
-                        if(renameItemResponse.err){
-                            if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
-                                treeLabel.value=dataItem.text;
-                                alert('Такое имя уже существует в данной папке!');
+                            if(renameItemResponse.err){
+                                if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
+                                    treeLabel.value=dataItem.text;
+                                    alert('Такое имя уже существует в данной папке!');
+                                }
+                            }else{
+                                dataItem.text=treeLabel.value;
                             }
-                        }else{
-                            dataItem.text=treeLabel.value;
                         }
                         
+                        treeLabelBlur.call(this);  
                     }
                 })
 
@@ -299,23 +310,26 @@ export class ChartsCollection{
 
                 treeButton.addEventListener('blur',(event)=>{
                     if(treeButton.onEdit){
-                        treeButton.className='tree-title';
-                        treeButton.setAttribute('readonly', 'true');
-                        treeButton.onEdit=false;
-                        let renameItemResponse=ServerDataExchange.renameItem({
-                            idPath:this.mouseMTreeMenuEventPath.idPath,
-                            text: treeButton.value
-                        });
+                        async function treeButtonBlur(){
+                            treeButton.className='tree-title';
+                            treeButton.setAttribute('readonly', 'true');
+                            treeButton.onEdit=false;
+                            let renameItemResponse=await ServerDataExchange.renameItem({
+                                idPath:this.mouseMTreeMenuEventPath.idPath,
+                                text: treeButton.value
+                            });
 
-                        if(renameItemResponse.err){
-                            if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
-                                treeButton.value=dataItem.text;
-                                alert('Такое имя уже существует в данной папке!');
+                            if(renameItemResponse.err){
+                                if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
+                                    treeButton.value=dataItem.text;
+                                    alert('Такое имя уже существует в данной папке!');
+                                }
+                            }else{
+                                dataItem.text=treeButton.value;
                             }
-                        }else{
-                            dataItem.text=treeButton.value;
                         }
                         
+                        treeButtonBlur.call(this);
                        
                     }
                 })
@@ -675,7 +689,7 @@ export class ChartsCollection{
         //считываем путь из сессии
         let forChartPageData=JSON.parse(sessionStorage.getItem(locStorName(ChartsCollection.FOR_CHART_PAGE_STORAGENAME)));
         if(forChartPageData==undefined){
-            forChartPageData={idPath:'/'+this.treeData[0].Id};
+            forChartPageData={idPath:'/'+this.treeData[0].id};
         }
         let path=forChartPageData.idPath;
         let pathIds=path.split("/");

@@ -697,7 +697,7 @@ export class ChartCtrl{
 
             //заполняем временную ось
             let labels=[];  
-            for(let XPoint of dataFromServer.XPoints){
+            for(let XPoint of dataFromServer.xPoints){
                 labels.push(new Date(XPoint));
             }
             this.cData.baseLabels=Array.from(labels); //дополнительно
@@ -705,46 +705,46 @@ export class ChartCtrl{
 
             this.cData.datasets=[];
             //перебор трендов
-            for(let TrendNum=0; TrendNum<dataFromServer.Trends.length; TrendNum++){
-                let Trend=dataFromServer.Trends[TrendNum];
+            for(let trendNum=0; trendNum<dataFromServer.trends.length; trendNum++){
+                let trend=dataFromServer.trends[trendNum];
                 //временный датасет
-                let TempDataset={
-                    Name: Trend.Name, //дополнительно
-                    label: Trend.Label,
+                let tempDataset={
+                    Name: trend.name, //дополнительно
+                    label: trend.label,
                     baseData:[], //дополнительно
                     data:[],
-                    yAxisID: this.getDatasetProp(Trend.Name,"yAxisID"),
-                    hidden: this.getDatasetProp(Trend.Name,"hidden"),
-                    stepped: this.getDatasetProp(Trend.Name,"stepped"),
-                    fill: this.getDatasetProp(Trend.Name,"fill"),
-                    pointStyle: this.getDatasetProp(Trend.Name,"pointStyle"),
-                    borderWidth: this.getDatasetProp(Trend.Name,"borderWidth"),
-                    borderColor: this.getDatasetProp(Trend.Name,"borderColor",TrendNum),
-                    tension: this.getDatasetProp(Trend.Name,"tension"),
+                    yAxisID: this.getDatasetProp(trend.name,"yAxisID"),
+                    hidden: this.getDatasetProp(trend.name,"hidden"),
+                    stepped: this.getDatasetProp(trend.name,"stepped"),
+                    fill: this.getDatasetProp(trend.name,"fill"),
+                    pointStyle: this.getDatasetProp(trend.name,"pointStyle"),
+                    borderWidth: this.getDatasetProp(trend.name,"borderWidth"),
+                    borderColor: this.getDatasetProp(trend.name,"borderColor",trendNum),
+                    tension: this.getDatasetProp(trend.name,"tension"),
                 }
                 //заполняем перемены временного датасета массивами 
-                for(let Point of Trend.Points){
+                for(let point of trend.points){
                     //если к точке подвязан цвет
-                    if(Array.isArray(Point)){
-                        if (!Array.isArray(TempDataset.backgroundColor)){
-                            TempDataset.backgroundColor=[];
+                    if(Array.isArray(point)){
+                        if (!Array.isArray(tempDataset.backgroundColor)){
+                            tempDataset.backgroundColor=[];
                         }
                         
-                        TempDataset.backgroundColor.push(Point[1]);
-                        TempDataset.data.push(Point[0]);
-                        TempDataset.baseData.push(Point[0]);
+                        tempDataset.backgroundColor.push(point[1]);
+                        tempDataset.data.push(point[0]);
+                        tempDataset.baseData.push(point[0]);
                         //если чистое значение точки
                     }else{
 
-                        TempDataset.backgroundColor=this.getDatasetProp(Trend.Name,"backgroundColor",TrendNum);
+                        tempDataset.backgroundColor=this.getDatasetProp(trend.name,"backgroundColor",trendNum);
 
-                        TempDataset.data.push(Point);
-                        TempDataset.baseData.push(Point);
+                        tempDataset.data.push(point);
+                        tempDataset.baseData.push(point);
 
                     }
                 }
                 
-                this.cData.datasets.push(TempDataset);  
+                this.cData.datasets.push(tempDataset);  
             }
 
             //интегрирование данных трендов в плагин yScaleLegendsPlugin
@@ -775,13 +775,13 @@ export class ChartCtrl{
                 //тренды
                 for(let dataset of this.cData.datasets){
                     for(let Trend of dataFromServer.Trends){
-                        if(Trend.Name==dataset.Name){
+                        if(Trend.name==dataset.Name){
         
-                            dataset.label=Trend.Label;
+                            dataset.label=Trend.label;
         
                             //значения
-                            dataset.baseData=Array.from(Trend.Points);
-                            dataset.data=Array.from(Trend.Points);
+                            dataset.baseData=Array.from(Trend.points);
+                            dataset.data=Array.from(Trend.points);
                         }
                     }
                 }
@@ -803,18 +803,18 @@ export class ChartCtrl{
             this.chart.stop();
 
             //заполняем временную ось по полученым данным
-            for(let XPoint of dataFromServer.XPoints){
-                this.cData.baseLabels.push(new Date(XPoint));
-                this.cData.labels.push(new Date(XPoint));
+            for(let xPoint of dataFromServer.xPoints){
+                this.cData.baseLabels.push(new Date(xPoint));
+                this.cData.labels.push(new Date(xPoint));
             }
         
 
             //заполняем тренды по полученым данным
             for(let dataset of this.cData.datasets){
-                for(let Trend of dataFromServer.Trends){
-                    if(Trend.Name==dataset.Name){
+                for(let trend of dataFromServer.trends){
+                    if(trend.name==dataset.Name){
                         //значения
-                        for(let point of Trend.Points){
+                        for(let point of trend.points){
                             dataset.baseData.push(point);
                             dataset.data.push(point);
                         }

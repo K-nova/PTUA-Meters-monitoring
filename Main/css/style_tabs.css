@@ -1,0 +1,61 @@
+/*--------табы--------*/
+.tab{
+    margin: 0;
+    padding-right: 1em;
+    padding-left: 1em;
+    background-color: var(--BackColor);
+    color:white;
+    border: solid 1px var(--BackColor);
+    cursor: pointer;
+  }
+  
+  .tab:hover{
+    background-color:var(--ActivationColor);
+    transition-duration: var(--transition-duration) ;
+  }
+  
+  .tab.active{
+    background-color: white;
+    color:var(--BackColor);
+    transition-duration: var(--transition-duration) ;
+  }
+  
+  /*--------стили областей tabs--------*/
+  .tab_item{
+    display: none;
+    margin: 0;
+    border: solid 1px var(--BackColor);
+  }
+  
+  .tab_item.active{
+    display: block;
+  }
+  
+  .tab_item_area{
+    border: solid 1px var(--BackColor);
+    margin: 5px;
+    margin-top: .7em;
+    padding-top: 1em;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    position: relative;
+  }
+  
+  .tab_item_area_topic{
+    position: absolute;
+    margin: 0;
+    margin-left: .5em;
+    margin-right: 1em;
+    top: -12px;
+    background-color: white;
+  }
+  
+  .tab_item_area_sub{
+    margin: 0;
+    display: flex;
+   /* justify-content: space-evenly;*/
+  }
+  
+  .tab_item_area_sub_column{
+    margin-right: 2em;
+  }

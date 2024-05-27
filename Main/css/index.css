@@ -1,0 +1,42 @@
+/*--------Элементы основного экрана-----------*/
+.FullScreenBody{
+    position: fixed;
+    box-sizing: border-box;
+      height: 100%;
+      width: 100%;
+  }
+  
+  .header{ /*доступ по ID*/
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 20px;
+    min-height: 50px;
+    background-color: var(--SecondLGrayColor);
+  }
+  
+  .header-logo-image{
+    height: 50px;
+    cursor: pointer;
+  }
+  /*
+  .HeaderLogo:hover{
+      box-shadow: 0 0 20px #e87722;
+  }*/
+  
+  .header-menu-list{
+    display: flex;
+    column-gap: 50px;
+  }
+  
+  .header-menu-button{
+    height:50px;
+    text-transform: uppercase;
+  }
+  
+  
+  .Main{
+  width: 100%;
+  height: calc(100% - 50px);
+    
+  }

@@ -1,0 +1,29 @@
+/*--------контекстное меню мыши--------*/
+.mouseContextMenu{
+    display: none;
+    position: absolute;
+  
+    background-color: white;
+    color:var(--BackColor);
+    border: 1px solid var(--BackColor);
+  
+    font-family: 'Gotham-Black', Arial Black, sans-serif;
+    font-size: 14px;
+  }
+  
+  .mouseContextMenu ul{
+    margin: 0;
+    padding: 2px 2px;
+  }
+  
+  .mouseContextMenu li {
+    list-style: none;
+    margin: 5px 0px;
+    cursor: pointer;
+    /*background-color: #d0d0ce;*/
+  }
+  
+  .mouseContextMenu li:hover {
+    background-color:var(--ActivationColor);
+    transition-duration: var(--transition-duration) ;
+  }

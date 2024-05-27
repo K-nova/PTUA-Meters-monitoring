@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0" >
     <title>Chart</title>
     <!--подключение файла стилей--> 
-    <link rel="stylesheet" type="text/css" href="../Main/css/Style.css"> 
+    <link rel="stylesheet" type="text/css" href="../Main/css/style.css"> 
+    <link rel="stylesheet" type="text/css" href="../Main/css/style_accordion.css"> 
+    <link rel="stylesheet" type="text/css" href="../Main/css/style_pop_up.css"> 
+    <link rel="stylesheet" type="text/css" href="../Main/css/style_tabs.css"> 
+    <link rel="stylesheet" type="text/css" href="../Main/css/style_loader.css"> 
+    <link rel="stylesheet" type="text/css" href="../Main/css/style_trainingMessage.css"> 
     <link rel="stylesheet" href="../npm/node_modules/@simonwep/pickr/dist/themes/classic.min.css"/> 
     <link rel="stylesheet" href="../npm/node_modules/@simonwep/pickr/dist/themes/monolith.min.css"/> 
     <link rel="stylesheet" href="../npm/node_modules/@simonwep/pickr/dist/themes/nano.min.css"/> 
@@ -26,12 +31,7 @@
 <body>
     <div class="" id="bodyWrapper">
          <!--настройки счетчика. Смотри скрипт-->
-        <div class="accordion_item" id="meterSettings">        
-            <label for="meterSettings_checkbox" class="accordion_label" id="meterSettingsALabel">Настройки счетчика</label>
-            <input  type="checkbox" class="accordion_ctrlElement" id="meterSettings_checkbox">
-            <div class="accordion_expandIcon"></div>
-            <div class="accordion_content" id="meterSettingsWrap"></div>
-        </div>
+        <div id="accordionWrapper"></div>
         
         <div id="chart_wrapper">
             <!-- панель инструментов графика -->

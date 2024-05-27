@@ -2,17 +2,41 @@ import {ServDataExchangeSim} from "./ServDataExchangeSim.js";
 
 //класс обмена данными с сервером
 export let ServerDataExchange=class{
-    static DataExchangeSimulation= true;
+    static #dataExchangeSimulation=[
+        true, //GetChartData
+        true, //getTreeStructureData
+        true, //addItem
+        true, //deleteItem
+        true, //renameItem
+        true, //getMeterSettings
+        true, //setMeterSettings
+    ];
+    static #showInfo=[
+        false, //GetChartData
+        true, //getTreeStructureData
+        true, //addItem
+        true, //deleteItem
+        true, //renameItem
+        true, //getMeterSettings
+        true, //setMeterSettings
+    ];
     static NO_CHANGES='nc';
     static ERR_NAMEALREADYEXIST='err: name already exist in folder';
 
     //получить данные по графику счетчика
-    static async GetChartData(idPath,timeRange){
+    static async getChartData(idPath,timeRange){
         let result;
 
-        if(this.DataExchangeSimulation){
+        //симуляция обмена данными с сервером
+        if(this.#dataExchangeSimulation[0]){
           result =await new ServDataExchangeSim().getChartData(idPath,timeRange);
         }
+        
+        //инфо по данным в консоле
+        if(this.#showInfo[0]){
+            console.log('GetChartData', `sim=${this.#dataExchangeSimulation[0]}`, idPath, timeRange, result);
+        }
+        
 
         return result;
     };
@@ -21,7 +45,7 @@ export let ServerDataExchange=class{
     static async getTreeStructureData(){
         let result;
         //симуляция обмена данными с сервером
-        if(this.DataExchangeSimulation){
+        if(this.#dataExchangeSimulation[1]){
             result=await new ServDataExchangeSim().getTreeStructureData();
          }
 
@@ -40,60 +64,88 @@ export let ServerDataExchange=class{
             }
         }
  
+        //инфо по данным в консоле
+        if(this.#showInfo[1]){
+            console.log('getTreeStructureData', `sim=${this.#dataExchangeSimulation[1]}`, result);
+        }
+
          return result;
     };
 
     //добавить в струкутуру дерева данные элемента
-    static addItem=function(data){
+    static async addItem (data){
         let response={done:false, err:false, errDescription:''};
         //симуляция обмена данными с сервером
-        if(this.DataExchangeSimulation){
-            response=new ServDataExchangeSim().addItem(data);
+        if(this.#dataExchangeSimulation[2]){
+            response=await new ServDataExchangeSim().addItem(data);
         }
-        //console.log('addItem', response)
+
+        //инфо по данным в консоле
+        if(this.#showInfo[2]){
+            console.log('addItem', `sim=${this.#dataExchangeSimulation[2]}`, data, response);
+        }
+
         return response;
     }
 
     //удалить из струкутуры дерева данные элемента
-    static deleteItem=function(idPath){
+    static async deleteItem(idPath){
         //симуляция обмена данными с сервером
-        if(this.DataExchangeSimulation){
-            new ServDataExchangeSim().deleteItem(idPath);
+        if(this.#dataExchangeSimulation[3]){
+            await new ServDataExchangeSim().deleteItem(idPath);
+        }
+
+        //инфо по данным в консоле
+        if(this.#showInfo[3]){
+            console.log('deleteItem', `sim=${this.#dataExchangeSimulation[3]}`, idPath);
         }
     }
 
     //переименовать папку или счетчик
-    static renameItem=function(data){
+    static async renameItem(data){
         let response={done:false, err:false, errDescription:''};
         //симуляция обмена данными с сервером
-        if(this.DataExchangeSimulation){
-            response=new ServDataExchangeSim().renameItem(data);  
+        if(this.#dataExchangeSimulation[4]){
+            response=await new ServDataExchangeSim().renameItem(data);  
         }
-        //console.log('renameItem', response)
+
+        //инфо по данным в консоле
+        if(this.#showInfo[4]){
+            console.log('renameItem', `sim=${this.#dataExchangeSimulation[4]}`, data, response);
+        }
         return response;
     }
 
     //получить настройки счетчика
-    static getMeterSettings=function(idPath){
+    static async getMeterSettings (idPath){
         let result;
         //симуляция обмена данными с сервером
-        if(this.DataExchangeSimulation){
-            result=new ServDataExchangeSim().getMeterSettings(idPath);
+        if(this.#dataExchangeSimulation[5]){
+            result=await new ServDataExchangeSim().getMeterSettings(idPath);
         }
-        //console.log('getMeterSettings', result)
+
+        //инфо по данным в консоле
+        if(this.#showInfo[5]){
+            console.log('getMeterSettings', `sim=${this.#dataExchangeSimulation[5]}`, idPath, result);
+        }
+
         return result;
     }
 
     //изменить настройки счетчика
-    static setMeterSettings=function(data){
+    static async setMeterSettings(data){
         let response={done:false, err:false, errDescription:''};
 
         //симуляция обмена данными с сервером
-        if(this.DataExchangeSimulation){            
-            response=new ServDataExchangeSim().setMeterSettings(data);
+        if(this.#dataExchangeSimulation[6]){            
+            response=await new ServDataExchangeSim().setMeterSettings(data);
            
         }
-        //console.log('setMeterSettings', response)
+
+        //инфо по данным в консоле
+        if(this.#showInfo[6]){
+            console.log('setMeterSettings', `sim=${this.#dataExchangeSimulation[6]}`, data, response);
+        }
         return response;
     }
     
