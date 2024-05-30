@@ -9,9 +9,11 @@ export class ChartsCollection{
     container;
 
     tree;
+    treeNoDataDiv;
     treeLoader;
     treePlaceholder;
     treeData;
+    #noTreeData=false;
     treeTrainingMsg;
 
     mouseTTreeMenuWrapper;
@@ -24,6 +26,8 @@ export class ChartsCollection{
     mouseMTreeMenuWrapper;
     mouseMTreeMenuContent;
     mouseMTreeMenuEventPath={textPath:'',idPath:'',target:{},targetParent:{}, treeDataItem:{}};
+
+    #renameValueMemory='';
 
     addFolderPopUp;
     addFolder2PopUp;
@@ -47,6 +51,9 @@ export class ChartsCollection{
         this.container=document.querySelector('.container');
 
         this.tree=document.querySelector('#tree');
+        this.treeLoader=new PageElements.Loader(this.tree);
+        this.treePlaceholder=document.querySelector('#tree-placeholder');
+        this.treeNoDataDiv=new PageElements.NoData(this.treePlaceholder);
 
         this.workspace_wrapper=document.querySelector('#workspace_wrapper');
         this.workspace.element=document.querySelector('#Workspace');
@@ -56,20 +63,22 @@ export class ChartsCollection{
         this.wsUpButton=document.querySelector('#Subheader-button-up');
 
         //----определяем меню мыши
-        //***общее
+        //***---для пустой области
         this.mouseTTreeMenuWrapper=document.querySelector('#tree-mouseMenuWrapper-tree');
         this.mouseTTreeMenuContent=document.querySelectorAll('#tree-mouseMenuWrapper-tree li');
-        this.treePlaceholder=document.querySelector('#tree-placeholder');
         this.treePlaceholder.addEventListener('contextmenu', ()=>{
-            this.mouseFTreeMenuEventPath.target=this.treePlaceholder;
-            this.mouseFTreeMenuEventPath.idPath='/';
-            PageElements.createMouseContextMenu(event, this.mouseTTreeMenuWrapper);
+            if(!this.#noTreeData){
+                this.mouseFTreeMenuEventPath.target=this.treePlaceholder;
+                this.mouseFTreeMenuEventPath.idPath='/';
+                PageElements.createMouseContextMenu(event, this.mouseTTreeMenuWrapper);
+            }
+            
         })
         //добавить папку
         this.addFolderPopUp=new PageElements.PopUp(this.container,this.mouseTTreeMenuContent[0]);
         //далее смотри скрипт страницы
 
-        //***для папки
+        //***---для папки
         this.mouseFTreeMenuWrapper=document.querySelector('#tree-mouseMenuWrapper-folder');
         this.mouseFTreeMenuContent=document.querySelectorAll('#tree-mouseMenuWrapper-folder li');
         //добавить счетчик 
@@ -81,12 +90,8 @@ export class ChartsCollection{
         //переименовать
         this.mouseFTreeMenuContent[2].addEventListener('click', ()=>{
             let target=this.mouseFTreeMenuEventPath.target;
-            target.removeAttribute("readonly");
-            target.className='tree-title-rename';
-            target.onEdit=true;
-            // Выделяем текст в поле ввода
-            target.focus();
-            target.setSelectionRange(0, target.value.length);
+            this.#renameValueMemory=target.label.value;
+            target.editingOn();
         })
         //удалить
         this.mouseFTreeMenuContent[3].addEventListener('click', ()=>{
@@ -96,7 +101,7 @@ export class ChartsCollection{
                     await ServerDataExchange.deleteItem(this.mouseFTreeMenuEventPath.idPath);
 
                     //cоздаем дерево и заполняем воркспейс
-                    this.construct();
+                    this.initiateTree();
                 }
                 
                 deleteItem.call(this);
@@ -106,12 +111,13 @@ export class ChartsCollection{
         })
 
 
-        //***для счетчика
+        //***---для счетчика
         this.mouseMTreeMenuWrapper=document.querySelector('#tree-mouseMenuWrapper-meter');
         this.mouseMTreeMenuContent=document.querySelectorAll('#tree-mouseMenuWrapper-meter li');
-        //*переименовать
+        //переименовать
         this.mouseMTreeMenuContent[0].addEventListener('click', ()=>{
             let target=this.mouseMTreeMenuEventPath.target;
+            this.#renameValueMemory=target.value;
             target.removeAttribute("readonly");
             target.className='tree-title-rename';
             target.onEdit=true;
@@ -119,7 +125,7 @@ export class ChartsCollection{
             target.focus();
             target.setSelectionRange(0, target.value.length);
         })
-        //*удалить
+        //удалить
         this.mouseMTreeMenuContent[1].addEventListener('click', ()=>{
             if(confirm('удалить')){
                 async function deleteItem(){
@@ -127,7 +133,7 @@ export class ChartsCollection{
                     await ServerDataExchange.deleteItem(this.mouseMTreeMenuEventPath.idPath);
 
                     //cоздаем дерево и заполняем воркспейс
-                    this.construct();
+                    this.initiateTree();
                 }
                 
                 deleteItem.call(this);
@@ -137,34 +143,42 @@ export class ChartsCollection{
         })
 
         //----создаем дерево и заполняем воркспейс
-        this.construct(true);
+        this.initiateTree(true);
    
     };
 
     //cоздаем дерево и заполняем воркспейс
-    async construct(trainingMsg=false){
+    async initiateTree(trainingMsg=false){
         //запрос данных с сервера
-        this.treeLoader=new PageElements.Loader(this.tree);
+        this.treeLoader.show();
         this.treeData=await ServerDataExchange.getTreeStructureData();
         this.treeLoader.hide();
-        this.#createParentData(this.treeData, this.tree, true);
+        this.#noTreeData=this.treeData==undefined;
+        if(this.treeData!=undefined){
+            this.#createParentData(this.treeData, this.tree, true);
 
-        //постройка данных дерева
-        this.#createTree(this.tree, this.treeData, '', 20, true);
+            //постройка данных дерева
+            this.#createTree(this.tree, this.treeData, '', 20, true);
 
-        //ставим плейсхолдер в конце дерева
-        this.tree.appendChild(this.treePlaceholder);
+            //ставим плейсхолдер в конце дерева
+            this.tree.appendChild(this.treePlaceholder);
+            this.treeNoDataDiv.hide();
 
-        //открыть экран воркспейса
-        this.openByPath(this.#getPrevPath()); 
+            //открыть экран воркспейса
+            this.openByPath(this.#getPrevPath()); 
 
-        //установить функционал кнопки "вверх"
-        this.#setWsUpButtonFunc();
+            //установить функционал кнопки "вверх"
+            this.#setWsUpButtonFunc();
 
-        //тренировочные сообщения
-        if(trainingMsg){
-            this.#treeTrainingMsgs();
+            //тренировочные сообщения
+            if(trainingMsg){
+                this.#treeTrainingMsgs();
+            }
+        }else{
+            this.treeNoDataDiv.show();
+            this.#setNoDataWorkspace();
         }
+        
 
     }
     
@@ -200,88 +214,66 @@ export class ChartsCollection{
             if(dataItem.type=='folder'){
 
                 //---
-                let treeInput=document.createElement('input');
-                treeInput.className='tree-input';
-                treeInput.type='checkbox';
-                treeInput.id=`tree-input${treeInputIdSuf+'-'+dataItem.id}`;
-                treeItem.appendChild(treeInput);
-                treeInput.addEventListener('change',(event)=>{
-                    if(event.target.checked){
-                        treeExpandIcon.classList.add('opened');
-                    }else{
-                        treeExpandIcon.classList.remove('opened');
-                    }
-                    
+                let treeAccordion=new PageElements.Accordion(treeItem,
+                    `tree-input${treeInputIdSuf+'-'+dataItem.id}`,dataItem.text,true);  
+
+                treeAccordion.item.style.border='none';    
+                treeAccordion.label.className='tree-title';
+                treeAccordion.label.style.paddingLeft =`${paddingLeft-5}px`;
+                treeAccordion.expandIcon.className='tree-expandIcon'; 
+                treeAccordion.expandIcon.style.left=`${paddingLeft-15}px`;
+
+                treeAccordion.label.addEventListener('contextmenu', (event)=>{
+                        this.mouseFTreeMenuEventPath=this.#createPath(dataItem, false);
+                        this.mouseFTreeMenuEventPath.target=treeAccordion;
+                        this.mouseFTreeMenuEventPath.targetParent=treeItem;
+                        this.mouseFTreeMenuEventPath.treeDataItem=dataItem;
+                        PageElements.createMouseContextMenu(event, this.mouseFTreeMenuWrapper);
                 })
 
-                //---
-                let treeLabel=document.createElement('input');
-                treeLabel.type='text';
-                treeLabel.className='tree-title';
-                treeLabel.setAttribute('readonly', 'true');
-                treeLabel.value=dataItem.text;
-                treeLabel.style.paddingLeft=`${paddingLeft}px`;
-                treeItem.appendChild(treeLabel);
-                treeLabel.onEdit=false;
-                treeLabel.addEventListener('contextmenu', (event)=>{
-                    this.mouseFTreeMenuEventPath=this.#createPath(dataItem, false);
-                    this.mouseFTreeMenuEventPath.target=treeLabel;
-                    this.mouseFTreeMenuEventPath.targetParent=treeItem;
-                    this.mouseFTreeMenuEventPath.treeDataItem=dataItem;
-                    PageElements.createMouseContextMenu(event, this.mouseFTreeMenuWrapper);
-                })
 
-                treeLabel.addEventListener('click',(event)=>{
-                    if(!treeLabel.onEdit){
-                        treeInput.click();
+                treeAccordion.label.addEventListener('click',(event)=>{
+                    if(!treeAccordion.onEdit){
                         this.#setContent(dataItem);
                     }             
                 })
-                treeLabel.addEventListener('blur',(event)=>{
-                    if(treeLabel.onEdit){
+
+                treeAccordion.label.addEventListener('blur',(event)=>{
+                    if(treeAccordion.onEdit){
+                        treeAccordion.editingOff();
                         async function treeLabelBlur(){
-                            treeLabel.className='tree-title';
-                            treeLabel.setAttribute('readonly', 'true');
-                            treeLabel.onEdit=false;
+                            this.treeLoader.show();
                             let renameItemResponse=await ServerDataExchange.renameItem({
                                 idPath:this.mouseFTreeMenuEventPath.idPath,
-                                text: treeLabel.value
+                                text: treeAccordion.label.value
                             });
+                            this.treeLoader.hide();
 
                             if(renameItemResponse.err){
                                 if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
-                                    treeLabel.value=dataItem.text;
+                                    treeAccordion.label.value=dataItem.text;
                                     alert('Такое имя уже существует в данной папке!');
                                 }
                             }else{
-                                dataItem.text=treeLabel.value;
+                                dataItem.text=treeAccordion.label.value;
                             }
                         }
                         
-                        treeLabelBlur.call(this);  
+                        if(treeAccordion.label.value!=this.#renameValueMemory){
+                            treeLabelBlur.call(this); 
+                        }
+                                
                     }
                 })
 
-                //---
-                let treeExpandIcon=document.createElement('div');
-                treeExpandIcon.className='tree-expandIcon'
-                treeExpandIcon.style.left=`${paddingLeft-15}px`;
-                treeItem.appendChild(treeExpandIcon);
-                treeExpandIcon.addEventListener('click',(event)=>{
-                    treeInput.click();
-                })
-                
-                //---
-                let treeItemContent=document.createElement('div');
-                treeItemContent.className='tree-content';
-                treeItem.appendChild(treeItemContent);                              
+                //---                             
 
                 //создаем вложенный контент
-                    let nextLevPaddingLeft=paddingLeft+10;
-                    let nextTreeInputIdSuf =treeInputIdSuf+'-'+dataItem.id;
-                    if('children' in dataItem){
-                         this.#createTree(treeItemContent,dataItem.children,nextTreeInputIdSuf, nextLevPaddingLeft);
-                    }
+                let nextLevPaddingLeft=paddingLeft+10;
+                let nextTreeInputIdSuf =treeInputIdSuf+'-'+dataItem.id;
+                if('children' in dataItem){
+                    this.#createTree(treeAccordion.content,dataItem.children,nextTreeInputIdSuf, nextLevPaddingLeft);
+                }
                    
             }
             //нет вложенных элементов
@@ -314,10 +306,12 @@ export class ChartsCollection{
                             treeButton.className='tree-title';
                             treeButton.setAttribute('readonly', 'true');
                             treeButton.onEdit=false;
+                            this.treeLoader.show();
                             let renameItemResponse=await ServerDataExchange.renameItem({
                                 idPath:this.mouseMTreeMenuEventPath.idPath,
                                 text: treeButton.value
                             });
+                            this.treeLoader.hide();
 
                             if(renameItemResponse.err){
                                 if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
@@ -329,7 +323,9 @@ export class ChartsCollection{
                             }
                         }
                         
-                        treeButtonBlur.call(this);
+                        if(treeButton.value!=this.#renameValueMemory){
+                            treeButtonBlur.call(this);
+                        }
                        
                     }
                 })
@@ -502,24 +498,36 @@ export class ChartsCollection{
             let noContentLine=document.createElement('div');
             noContentLine.className="Overview-noContentContainer";
             this.workspaceContent.overview.appendChild(noContentLine);
-            
-            let noContentColumn=document.createElement('div');
-            noContentLine.appendChild(noContentColumn); 
 
-            let noContentImg=document.createElement("img");
-            noContentImg.className="Overview-noContentImg";
-            noContentImg.src="../Main/Data/NoContent.png";
-            noContentColumn.appendChild(noContentImg);   
-            
-            let noContentText=document.createElement('h1');
-            noContentText.innerText='Папка пуста';
-            noContentColumn.appendChild(noContentText);
+            let NoContent=new PageElements.NoData(noContentLine, 'Папка пуста');
+            NoContent.show();
+
         }
 
         
 
        
     };
+
+    //установить экран отсутствия данных дерева
+    #setNoDataWorkspace=()=>{
+        //удаляем предыдущие элементы
+        this.#clearContent();
+
+        //создаем область страницы
+        this.workspaceContent.overview = document.createElement("div");
+        this.workspaceContent.overview.className="OverviewContainer";
+        this.workspace.element.appendChild(this.workspaceContent.overview);
+
+        //создаем внутрение объекты
+        let noContentLine=document.createElement('div');
+        noContentLine.className="Overview-noContentContainer";
+        this.workspaceContent.overview.appendChild(noContentLine);
+
+        let NoContent=new PageElements.NoData(noContentLine, 'Нет данных');
+        NoContent.show();
+
+    }
 
     //установить график в рабочей области
     #setChartInWorkspace=function(){

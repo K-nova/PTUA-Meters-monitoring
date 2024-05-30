@@ -452,7 +452,7 @@ export class ServDataExchangeSim{
                 //проверяем ошибки такого же имени
                 let nameExist=false;
                 for(let item of foundResult.targetFolder){
-                    if(item.text==data.text  && item.Id!=foundResult.item.Id){
+                    if(item.text==data.text  && item.id!=foundResult.item.id){
                         nameExist=true;
                         response.err=true;
                         response.errDescription=this.#ERR_NAMEALREADYEXIST;
@@ -493,7 +493,7 @@ export class ServDataExchangeSim{
                 //проверяем ошибки такого же имени
                 let nameExist=false;
                 for(let item of foundResult.targetFolder){
-                    if(item.text==data.text && item.Id!=foundResult.item.Id){
+                    if(item.text==data.text && item.id!=foundResult.item.id){
                         nameExist=true;
                         response.err=true;
                         response.errDescription=this.#ERR_NAMEALREADYEXIST;

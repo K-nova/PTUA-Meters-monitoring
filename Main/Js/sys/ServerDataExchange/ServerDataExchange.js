@@ -44,6 +44,7 @@ export let ServerDataExchange=class{
     //получить данные по структуре дерева
     static async getTreeStructureData(){
         let result;
+        let error=false;
         //симуляция обмена данными с сервером
         if(this.#dataExchangeSimulation[1]){
             result=await new ServDataExchangeSim().getTreeStructureData();
@@ -52,20 +53,19 @@ export let ServerDataExchange=class{
          //обмен данными с сервером
          else{
             try{
-                let response=await fetch('http://172.17.1.65/api/meters',{
-                    method: "GET", 
-                    //mode: 'no-cors',
-                    //headers: {'Content-Type': 'application/json'}
+                let response=await fetch('http://172.17.1.36/api/tree',{
+                    method: "GET"
                 })
                 result=await response.json();
             }
             catch(err){
-                console.error('Произошла ошибка:', err);
+                console.error('getTreeStructureData', 'sim=false', 'Ошибка запроса', err);
+                error=true;
             }
         }
  
         //инфо по данным в консоле
-        if(this.#showInfo[1]){
+        if(this.#showInfo[1] && !error){
             console.log('getTreeStructureData', `sim=${this.#dataExchangeSimulation[1]}`, result);
         }
 

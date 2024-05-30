@@ -61,7 +61,7 @@ let addFolderPopUpLogic=function(content, popUp){
         //анализируем ответ сервера
         if(!addFolderResponse.err){
             //пересобираем дерево и воркспейс
-            ChartColl.construct();
+            ChartColl.initiateTree();
 
             acceptDone=true;
         }else{
@@ -158,7 +158,7 @@ async function meterSettingApply(){
 
     if(!addMeterResponse.err){
         //пересобираем дерево и воркспейс
-        ChartColl.construct();
+        ChartColl.initiateTree();
     }else{
         if(addMeterResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
             MeterSettingsContent.addNameErr('Такое имя уже существует в данной папке!');          

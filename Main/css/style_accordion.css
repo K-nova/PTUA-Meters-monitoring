@@ -32,6 +32,13 @@
   
     cursor: pointer;
   }
+
+.accordion_label.onEdit, .accordion_label.onEdit:hover{
+    background-color:#FFFFFF;
+    color:var(--BackColor);
+  
+    cursor: auto;
+  }
   
   .accordion_label.blinking{
     animation: accordion_blink 1s infinite;
@@ -47,7 +54,7 @@
     background-color:var(--ActivationColor);
     transition: background (--transition-duration) ease-out;
   }
-  
+
   .accordion_content{
     display: none;
   }

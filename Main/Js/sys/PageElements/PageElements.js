@@ -7,6 +7,7 @@ import {OkCancelAccept} from "./OkCancelAccept.js";
 import {Loader} from "./Loader.js";
 import {LoaderType2} from "./LoaderType2.js";
 import {Accordion} from "./Accordion.js";
+import {NoData} from "./NoData.js";
 
 export var PageElements={
    
@@ -399,5 +400,7 @@ export var PageElements={
 
     LoaderType2:LoaderType2,
 
-    Accordion:Accordion
+    Accordion:Accordion,
+
+    NoData:NoData
 }
