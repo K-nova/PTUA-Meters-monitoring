@@ -1,5 +1,6 @@
 import {trendSetpoints, LocSessionName2} from "../GlobalConst.js";
-import {locStorName, isJSON} from "../Functions.js";
+import {isJSON} from "../Functions.js";
+import {StorageCtrl} from "../StorageCtrl.js";
 import {DateTime} from "../DateTime.js";
 import {ServerDataExchange} from "../ServerDataExchange/ServerDataExchange.js";
 import {DefaultPar} from "./ChartCtrl_defPar.js";
@@ -308,7 +309,7 @@ export class ChartCtrl{
         let ChartPath= this.idPath;
 
         //Считываем сохраненные параметры графика из сессии
-        let FullProperties = JSON.parse(sessionStorage.getItem(locStorName(LocSessionName2)));
+        let FullProperties=StorageCtrl.getItem(LocSessionName2);
 
        let ChartExist=false; 
        let ChartNum;
@@ -367,7 +368,7 @@ export class ChartCtrl{
     let ChartPath= this.idPath;
 
     //Считываем сохраненные параметры графика из сессии
-    let FullProperties = JSON.parse(sessionStorage.getItem(locStorName(LocSessionName2)));
+    let FullProperties=StorageCtrl.getItem(LocSessionName2);
 
     //проверка наличия записи в сессии
     let CCFResult=this.aux.checkCreateFullProp(FullProperties, true);
@@ -405,7 +406,7 @@ export class ChartCtrl{
     }
     
     //сохраняем данные в локальной сессии
-    sessionStorage.setItem(locStorName(LocSessionName2), JSON.stringify(CCFResult.FullProperties));
+    StorageCtrl.setItem(LocSessionName2, CCFResult.FullProperties);
 
 }
 
@@ -419,7 +420,7 @@ export class ChartCtrl{
     let ChartPath= this.idPath;
 
     //Считываем сохраненные параметры графика из сессии
-    let FullProperties = JSON.parse(sessionStorage.getItem(locStorName(LocSessionName2)));
+    let FullProperties=StorageCtrl.getItem(LocSessionName2);
 
    let ChartExist=false; 
    let ChartNum;
@@ -522,7 +523,7 @@ export class ChartCtrl{
         let ChartPath= this.idPath;
 
         //Считываем сохраненные параметры графика из сессии
-        let FullProperties = JSON.parse(sessionStorage.getItem(locStorName(LocSessionName2)));
+        let FullProperties=StorageCtrl.getItem(LocSessionName2);
 
         //проверка наличия записи в сессии
         let CCFResult=this.aux.checkCreateFullProp(FullProperties, true);
@@ -557,7 +558,7 @@ export class ChartCtrl{
         }
          
         //сохраняем данные в локальной сессии
-        sessionStorage.setItem(locStorName(LocSessionName2), JSON.stringify(FullProperties));
+        StorageCtrl.setItem(LocSessionName2, FullProperties);
 
     }
 

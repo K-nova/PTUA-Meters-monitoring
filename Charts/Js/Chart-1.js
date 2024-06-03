@@ -1,4 +1,4 @@
-import {locStorName} from "../../Main/Js/sys/Functions.js";
+import {StorageCtrl} from "../../Main/Js/sys/StorageCtrl.js";
 
 import {ChartsCollection} from "../../Main/Js/sys/ChartsCollection.js";
 import {ChartCtrl} from "../../Main/Js/sys/ChartCtrl/ChartCtrl.js";
@@ -39,7 +39,7 @@ async function chartFunction(){
     chartCover_zIndex=window.getComputedStyle(chartCover.body).zIndex;
 
     //общие данные для страницы диаграммы
-    forChartPageData=JSON.parse(sessionStorage.getItem(locStorName(ChartsCollection.FOR_CHART_PAGE_STORAGENAME)));
+    forChartPageData=StorageCtrl.getItem(ChartsCollection.FOR_CHART_PAGE_STORAGENAME);
 
     //------------область настроек счетчика
     let Chart_meterSetiingsInst= new Chart_meterSettings();

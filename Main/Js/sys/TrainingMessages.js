@@ -1,4 +1,4 @@
-import {locStorName} from "./Functions.js";
+import {StorageCtrl} from "./StorageCtrl.js";
 import {PageElements} from "./PageElements/PageElements.js";
 
 //управление сообщениями обучения
@@ -20,7 +20,7 @@ export let TrainingMessages=class{
         let closedMem=true;
 
         //--создаем первое тренирочные сообщения
-        let optionNum=sessionStorage.getItem(locStorName(this.#currMsgMem+id));
+        let optionNum=StorageCtrl.getItem(this.#currMsgMem+id, false);
         if(optionNum!=undefined && optionNum>=0){
             this.optionsNum=optionNum;
         }
@@ -70,8 +70,7 @@ export let TrainingMessages=class{
                     }
     
                     //записываем в локальную сессию уже пройденные сообщения
-                    sessionStorage.setItem(locStorName(this.#currMsgMem+id), this.optionsNum);  
-    
+                    StorageCtrl.setItem(this.#currMsgMem+id, this.optionsNum,false);
                     
     
                 }

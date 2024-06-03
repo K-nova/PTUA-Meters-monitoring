@@ -1,6 +1,7 @@
 import {PageElements} from "./PageElements/PageElements.js";
 import {ServerDataExchange} from "./ServerDataExchange/ServerDataExchange.js";
-import {locStorName, getFileSity} from "./Functions.js";
+import {getFileSity} from "./Functions.js";
+import {StorageCtrl} from "./StorageCtrl.js";
 import {TrainingMessages} from "./TrainingMessages.js";
 
 //общее управление всеми графиками
@@ -731,7 +732,7 @@ export class ChartsCollection{
             forChartPageData.path=path;
 
             //сохраняем путь в локальной сессии
-            sessionStorage.setItem(locStorName(ChartsCollection.FOR_CHART_PAGE_STORAGENAME),JSON.stringify(forChartPageData));
+            StorageCtrl.setItem(ChartsCollection.FOR_CHART_PAGE_STORAGENAME, forChartPageData);
         }
         //--если нужно просто передать данные
         else{
@@ -749,7 +750,7 @@ export class ChartsCollection{
     //считать путь ранее открытого контента
     #getPrevPath=function(){
         //считываем путь из сессии
-        let forChartPageData=JSON.parse(sessionStorage.getItem(locStorName(ChartsCollection.FOR_CHART_PAGE_STORAGENAME)));
+        let forChartPageData=StorageCtrl.getItem(ChartsCollection.FOR_CHART_PAGE_STORAGENAME);
         if(forChartPageData==undefined){
             forChartPageData={idPath:'/'+this.treeData[0].id};
         }

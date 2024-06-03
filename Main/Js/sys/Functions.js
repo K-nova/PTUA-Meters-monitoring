@@ -11,11 +11,7 @@ export function getFileSity(fileName){
     return  JSON.parse(request.responseText);
 }
 
-//функция добавления префикса id проекта в имя локальной переменной
-export function locStorName(propertyName){
-    let result=projectId+'_'+propertyName;
-    return result;
-}
+
 
 //-------
 //проверка, что данные являются JSON

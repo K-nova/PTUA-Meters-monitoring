@@ -1,10 +1,10 @@
-import {locStorName} from "../../Main/Js/sys/Functions.js";
+import {StorageCtrl} from "../Js/sys/StorageCtrl.js";
 
 let i=0;
 let slideshowItems=document.querySelectorAll('.slideshow-item');
 slideshowItems[i].classList.add('active');
 
-let passedSteps=sessionStorage.getItem(locStorName('slideShow_passedSteps'));
+let passedSteps=StorageCtrl.getItem('slideShow_passedSteps',false);
 if(passedSteps==undefined){passedSteps=false;}
 
 //кнопка далее
@@ -17,7 +17,7 @@ let slideshowButtonELF=()=>{
         slideshowItems[i].classList.add('active');
         slideshowButtons[i].addEventListener('click',()=>{slideshowButtonELF()});
     }else{
-        sessionStorage.setItem(locStorName('slideShow_passedSteps'), true);
+        StorageCtrl.setItem('slideShow_passedSteps', true, false);
 
         let Main=window.parent.document.querySelector('#Main');
         Main.data='Charts/Charts-main.html';
