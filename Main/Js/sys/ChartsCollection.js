@@ -69,7 +69,8 @@ export class ChartsCollection{
         this.treePlaceholder.addEventListener('contextmenu', ()=>{
             if(!this.#noTreeData){
                 this.mouseFTreeMenuEventPath.target=this.treePlaceholder;
-                this.mouseFTreeMenuEventPath.idPath='/';
+                this.mouseFTreeMenuEventPath.id='/';
+                this.mouseFTreeMenuEventPath.parentId='/';
                 PageElements.createMouseContextMenu(event, this.mouseTTreeMenuWrapper);
             }
             
@@ -98,10 +99,13 @@ export class ChartsCollection{
             if(confirm('удалить')){
                 async function deleteItem(){
                     //запрос серверу на удаление данных
-                    await ServerDataExchange.deleteItem(this.mouseFTreeMenuEventPath.idPath);
+                    let folderDeleteResponse=await ServerDataExchange.deleteItem({
+                        id:this.mouseFTreeMenuEventPath.id,
+                        meter:false
+                    });
 
                     //cоздаем дерево и заполняем воркспейс
-                    this.initiateTree();
+                    if(folderDeleteResponse.done){this.initiateTree();}      
                 }
                 
                 deleteItem.call(this);
@@ -130,10 +134,13 @@ export class ChartsCollection{
             if(confirm('удалить')){
                 async function deleteItem(){
                     //запрос серверу на удаление данных
-                    await ServerDataExchange.deleteItem(this.mouseMTreeMenuEventPath.idPath);
+                    let meterDeleteResponse=await ServerDataExchange.deleteItem({
+                        id:this.mouseMTreeMenuEventPath.id,
+                        meter:true
+                    });
 
                     //cоздаем дерево и заполняем воркспейс
-                    this.initiateTree();
+                    if(meterDeleteResponse.done){this.initiateTree();}
                 }
                 
                 deleteItem.call(this);
@@ -155,7 +162,7 @@ export class ChartsCollection{
         this.treeLoader.hide();
         this.#noTreeData=this.treeData==undefined;
         if(this.treeData!=undefined){
-            this.#createParentData(this.treeData, this.tree, true);
+            this.#createParentData(this.treeData, this.tree, true, true);
 
             //постройка данных дерева
             this.#createTree(this.tree, this.treeData, '', 20, true);
@@ -182,12 +189,26 @@ export class ChartsCollection{
 
     }
     
-    //функция добавления родительских данных в данные по графикам
-    #createParentData=(treeData,parent, root=false)=>{
-        for(let item of treeData){
-            item.parent=parent;
-            item.root=root;
-            if('children' in item){this.#createParentData(item.children, item)};
+    //функция обработки полученных данных
+    #createParentData=(treeData,parent, root=false, folder=true)=>{
+        for(let treeDataItem of treeData){
+            treeDataItem.parent=parent;
+            treeDataItem.root=root;
+
+            if(folder){
+                //ставим флаг, что это папка
+                treeDataItem.type='folder';
+
+                //обрабатываем данные вложеных папок и счетчиков
+                if(treeDataItem.folders.length>0){
+                    this.#createParentData(treeDataItem.folders, treeDataItem, false, true)
+                };
+                if(treeDataItem.meters.length>0){
+                    this.#createParentData(treeDataItem.meters, treeDataItem, false, false)
+                }
+            }
+
+            
         }
     };
 
@@ -210,12 +231,12 @@ export class ChartsCollection{
             tree.appendChild(treeItem);
 
 
-            //---есть вложенные элементы
+            //---есть вложенные элементы (папка)
             if(dataItem.type=='folder'){
 
                 //---
                 let treeAccordion=new PageElements.Accordion(treeItem,
-                    `tree-input${treeInputIdSuf+'-'+dataItem.id}`,dataItem.text,true);  
+                    `tree-input${treeInputIdSuf+'-'+dataItem.id}`,dataItem.name,true);  
 
                 treeAccordion.item.style.border='none';    
                 treeAccordion.label.className='tree-title';
@@ -244,18 +265,19 @@ export class ChartsCollection{
                         async function treeLabelBlur(){
                             this.treeLoader.show();
                             let renameItemResponse=await ServerDataExchange.renameItem({
-                                idPath:this.mouseFTreeMenuEventPath.idPath,
-                                text: treeAccordion.label.value
+                                id:this.mouseFTreeMenuEventPath.id,
+                                meter:false,
+                                name: treeAccordion.label.value
                             });
                             this.treeLoader.hide();
 
                             if(renameItemResponse.err){
                                 if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
-                                    treeAccordion.label.value=dataItem.text;
+                                    treeAccordion.label.value=dataItem.name;
                                     alert('Такое имя уже существует в данной папке!');
                                 }
                             }else{
-                                dataItem.text=treeAccordion.label.value;
+                                dataItem.name=treeAccordion.label.value;
                             }
                         }
                         
@@ -271,18 +293,21 @@ export class ChartsCollection{
                 //создаем вложенный контент
                 let nextLevPaddingLeft=paddingLeft+10;
                 let nextTreeInputIdSuf =treeInputIdSuf+'-'+dataItem.id;
-                if('children' in dataItem){
-                    this.#createTree(treeAccordion.content,dataItem.children,nextTreeInputIdSuf, nextLevPaddingLeft);
+                if(dataItem.folders.length>0){
+                    this.#createTree(treeAccordion.content,dataItem.folders,nextTreeInputIdSuf, nextLevPaddingLeft);
+                }
+                if(dataItem.meters.length>0){
+                    this.#createTree(treeAccordion.content,dataItem.meters,nextTreeInputIdSuf, nextLevPaddingLeft);
                 }
                    
             }
-            //нет вложенных элементов
+            //нет вложенных элементов (счетчик)
             else{
 
                 let  treeButton=document.createElement('input');
                 treeButton.className='tree-title';
                 treeButton.setAttribute('readonly', 'true');
-                treeButton.value=dataItem.text;
+                treeButton.value=dataItem.name;
                 treeButton.style.paddingLeft=`${paddingLeft}px`;
                 treeItem.appendChild(treeButton);
                 treeButton.onEdit=false;
@@ -308,18 +333,19 @@ export class ChartsCollection{
                             treeButton.onEdit=false;
                             this.treeLoader.show();
                             let renameItemResponse=await ServerDataExchange.renameItem({
-                                idPath:this.mouseMTreeMenuEventPath.idPath,
-                                text: treeButton.value
+                                id:this.mouseMTreeMenuEventPath.id,
+                                meter:true,
+                                name: treeButton.value
                             });
                             this.treeLoader.hide();
 
                             if(renameItemResponse.err){
                                 if(renameItemResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
-                                    treeButton.value=dataItem.text;
+                                    treeButton.value=dataItem.name;
                                     alert('Такое имя уже существует в данной папке!');
                                 }
                             }else{
-                                dataItem.text=treeButton.value;
+                                dataItem.name=treeButton.value;
                             }
                         }
                         
@@ -398,7 +424,7 @@ export class ChartsCollection{
     //установить обзор графиков в рабочей области
     #setOverviewInWorkspace=(contentData)=>{
         //функция создания кнопки обзора
-        let createOverviewButton=function(dataItem, img){
+        let createOverviewButton=(dataItem, img)=>{
             //создаем кнопку
             let button=document.createElement("button");
             button.className="Overview";
@@ -420,7 +446,7 @@ export class ChartsCollection{
             //создаем текст
             let buttonText=document.createElement("figcaption");
             buttonText.className="Overview-text";
-            buttonText.textContent = dataItem.text;
+            buttonText.textContent = dataItem.name;
             figure.appendChild(buttonText);
     
         };
@@ -436,19 +462,31 @@ export class ChartsCollection{
         //создаем внутрение объекты
         this.workspaceContent.overviewButtons=[];
         //отрисовка кнопок обзора графиков
-        if('children' in contentData){
-            for(let dataItem of contentData.children){
+        if(contentData.folders.length>0 ||contentData.meters.length>0){
+            //создаем кнопки папок
+            if(contentData.folders.length>0){
+                for(let dataItem of contentData.folders){
             
-                //создаем рисунок
-                let img=document.createElement("img");
-                img.className="Overview-picture";
-
-                //рисунок кнопки обзора -папка
-                if(dataItem.type=='folder'){
+                    //создаем рисунок
+                    let img=document.createElement("img");
+                    img.className="Overview-picture";
+    
+                    //рисунок кнопки обзора -папка
                     img.src="../Main/Data/Folder.png";
+                    
+                    //создаем кнопку обзора
+                    createOverviewButton(dataItem,img);
                 }
-                //рисунок кнопки обзора -график
-                else{
+            }
+            //создаем кнопки счетчиков
+            if(contentData.meters.length>0){
+                for(let dataItem of contentData.meters){
+            
+                    //создаем рисунок
+                    let img=document.createElement("img");
+                    img.className="Overview-picture";
+    
+                    
                     switch (dataItem.chartType) {
                         case 'line':
                             img.src="Data/line-chart-icon.png";
@@ -466,13 +504,12 @@ export class ChartsCollection{
                             img.src="Data/line-chart-icon.png";
                             break;
                     }
-                    
+                        
+                    //создаем кнопку обзора
+                    createOverviewButton(dataItem,img);
                 }
-
-                //создаем кнопку обзора
-                createOverviewButton.call(this,dataItem,img);
-
             }
+
             //------------training messages
             this.overviewTrainingMsg=new TrainingMessages('overview',[
                 {target:this.workspaceContent.overviewButtons[0], text:'нажмите на одну из кнопок, чтоб перейти на страницу счетчика или в подпапку'}
@@ -503,8 +540,6 @@ export class ChartsCollection{
             NoContent.show();
 
         }
-
-        
 
        
     };
@@ -644,20 +679,31 @@ export class ChartsCollection{
         let result;
 
         //--устанавливаем начальные значения
-        let wsSubheaderText=contentData.text;
-        let idPath=contentData.id;
-        let name=contentData.text;
+        let wsSubheaderText=contentData.name;
+        let idPath;
+        let id=contentData.id;
+        let parentId=contentData.parent.id;
+        let folder=false;
+        if(contentData.type=='folder'){
+            idPath=contentData.id;  
+            folder=true;    
+        }else{
+            idPath='m:'+contentData.id;  
+        }
+        
+        let name=contentData.name;
         let path='';
+
         
 
         //--формируем путь
-        let treeDataIteration=function(contentData){
+        let treeDataIteration=(contentData)=>{
             let parent=contentData.parent;
             if(!contentData.root){
-                wsSubheaderText=parent.text+'/'+wsSubheaderText;
+                wsSubheaderText=parent.name+'/'+wsSubheaderText;
                 idPath=parent.id+'/'+idPath;
-                path=parent.text+'/'+path;
-                treeDataIteration.call(this,parent);
+                path=parent.name+'/'+path;
+                treeDataIteration(parent);
             }
             else{
                 wsSubheaderText='/'+wsSubheaderText;
@@ -666,7 +712,7 @@ export class ChartsCollection{
             }
         }
   
-        treeDataIteration.call(this,contentData);
+        treeDataIteration(contentData);
 
         //--если функция вызывается для заголовка воркспейса
         if(forHeader){
@@ -678,6 +724,9 @@ export class ChartsCollection{
             //сохраняем в параметре класса
             this.idPath=idPath;
             forChartPageData.idPath=idPath;
+            forChartPageData.id=id;
+            forChartPageData.parentId=parentId;
+            forChartPageData.folder=folder;
             forChartPageData.name=name;
             forChartPageData.path=path;
 
@@ -686,7 +735,12 @@ export class ChartsCollection{
         }
         //--если нужно просто передать данные
         else{
-            result={textPath:wsSubheaderText,idPath:idPath};
+            result={textPath:wsSubheaderText,
+                idPath:idPath,
+                id:id,
+                parentId:parentId,
+                folder:folder
+            };
         }
 
         return result;    
@@ -711,18 +765,42 @@ export class ChartsCollection{
     openByPath=function(pathIds){
         let contentData;
         
+        let itemType=(pathId)=>{
+            let result={};
+
+            if(pathId.startsWith('m:')){
+                result.id=pathId.replace('m:', '');
+                result.folder=false;
+            }else{
+                result.id=pathId;
+                result.folder=true;
+            }
+
+            return result;
+        }
         //функция итерации id
         let idIteration=(pathIds, treeData)=>{
             let result;
 
+            //определяем свойства первого элемента в пути
+            let target= itemType(pathIds[0]);
+
             //находим соответствующий id в 
             for(let treeDataItem of treeData){
-                if(pathIds[0]==treeDataItem.id){
-                    
+                if(target.id==treeDataItem.id){
                     //переход на один уровень вниз
                     if(pathIds.length>1){
                         pathIds.shift();
-                        result=idIteration(pathIds, treeDataItem.children);
+                        let childTarget= itemType(pathIds[0]);
+                        //ищем папки
+                        if(childTarget.folder){
+                            result=idIteration(pathIds, treeDataItem.folders);
+                        }
+                        //ищем счетчики    
+                        else{
+                            result=idIteration(pathIds, treeDataItem.meters);
+                        }
+                     
                     }
                     //возврат текущего уровня
                     else{

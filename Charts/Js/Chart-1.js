@@ -72,7 +72,7 @@ async function chartFunction(){
         chartLoader.show();
 
         let DataFromServer=
-        await ServerDataExchange.getChartData(forChartPageData.idPath,
+        await ServerDataExchange.getChartData(forChartPageData.id,
         {
             type:type,
             firstValue:firstVal,
@@ -150,7 +150,7 @@ async function chartFunction(){
             chartLoader.show();
             //запрашиваем данные
             let dataFromServerForUpdate=
-            await ServerDataExchange.getChartData(forChartPageData.idPath,
+            await ServerDataExchange.getChartData(forChartPageData.id,
             {
                 type:'1',
                 firstValue:firstVal,

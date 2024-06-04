@@ -13,6 +13,8 @@ export let MeterSettingsContent=class{
         wraper_meter_name:{},
         label_meter_name:{},
         input_meter_name:{},
+
+        nameErr:undefined
     };
     
     mSArea2={
@@ -96,23 +98,36 @@ export let MeterSettingsContent=class{
         
     }
 
-    addNameErr=function(text){
-        let errText_nameExist=document.createElement('div');
-        errText_nameExist.classList.add('text');
-        errText_nameExist.classList.add('err');
-        errText_nameExist.innerText=text;
-        this.mSArea1.wraper_meter_name.appendChild(errText_nameExist);
+    setNameErr=(text)=>{
+        if(this.nameErr==undefined){
+            this.nameErr=document.createElement('div');
+            this.nameErr.classList.add('text');
+            this.nameErr.classList.add('err');
+            this.nameErr.innerText=text;
+            this.mSArea1.wraper_meter_name.appendChild(this.nameErr);
+        }else{
+            this.nameErr.innerText=text;
+        }
 
         this.mSArea1.input_meter_name.classList.add('input');
         this.mSArea1.input_meter_name.classList.add('err');
 
         this.mSArea1.input_meter_name.addEventListener('input',()=>{
             this.mSArea1.input_meter_name.classList.remove('err');
-            errText_nameExist.remove();
+            this.nameErr.remove();
+            this.nameErr=undefined;
         })
     }
 
-    #createMSArea1=function(){
+    deleteNameErr=()=>{
+        this.mSArea1.input_meter_name.classList.remove('err');
+        if(this.nameErr!=undefined){
+            this.nameErr.remove();
+            this.nameErr=undefined;
+        }
+    }
+
+    #createMSArea1=()=>{
         this.mSArea1.body=document.createElement('div');
         this.mSArea1.body.className='tab_item_area';
         this.meterSettingsWrapper.appendChild(this.mSArea1.body);
@@ -144,7 +159,7 @@ export let MeterSettingsContent=class{
         this.mSArea1.wraper_meter_name.appendChild(this.mSArea1.input_meter_name);
     }
 
-    #createMSArea2=function(){
+    #createMSArea2=()=>{
         this.mSArea2.body=document.createElement('div');
         this.mSArea2.body.className='tab_item_area';
         this.meterSettingsWrapper.appendChild(this.mSArea2.body);
@@ -215,7 +230,7 @@ export let MeterSettingsContent=class{
           });
     }
 
-    #createMSArea3=function(){
+    #createMSArea3=()=>{
         this.mSArea3.body=document.createElement('div');
         this.mSArea3.body.className='tab_item_area';
         this.meterSettingsWrapper.appendChild(this.mSArea3.body);

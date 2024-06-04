@@ -40,7 +40,7 @@ export class Chart_meterSettings{
         let meterSettingsLoader=new PageElements.LoaderType2(MeterSettingsAccordion.labelAdditional);
         meterSettingsLoader.invertColor();
         meterSettingsLoader.show();
-        let meterSettingsData=await ServerDataExchange.getMeterSettings(forChartPageData.idPath);
+        let meterSettingsData=await ServerDataExchange.getMeterSettings(forChartPageData.id);
         meterSettingsLoader.hide();
 
         //область Общее
@@ -48,8 +48,9 @@ export class Chart_meterSettings{
         MeterSetting.mSArea1.input_meter_name.value=forChartPageData.name;
 
         //область Подключение
+        let meterSettingsIps=meterSettingsData.ip.split('.');
         for(let i=0; i<4; i++){
-            MeterSetting.mSArea2.input_ip[i].value=meterSettingsData.ip[i];
+            MeterSetting.mSArea2.input_ip[i].value=meterSettingsIps[i];
         }
         MeterSetting.mSArea2.select_rs_type.value=meterSettingsData.rs_type;
         MeterSetting.mSArea2.input_rs_port.value=meterSettingsData.rs_port;
@@ -82,10 +83,12 @@ export class Chart_meterSettings{
             //общее
             setMeterData.text=MeterSetting.mSArea1.input_meter_name.value;
             //подключение
-            setMeterData.meterSettings.ip=[];
+            let meterSettingsIpArr=[];
             for(let i=0; i<4; i++){
-                setMeterData.meterSettings.ip[i]=MeterSetting.mSArea2.input_ip[i].value;
+                meterSettingsIpArr[i]=MeterSetting.mSArea2.input_ip[i].value;
             }
+            setMeterData.meterSettings.ip=meterSettingsIpArr.join('.');
+
             setMeterData.meterSettings.rs_type=MeterSetting.mSArea2.select_rs_type.value;
             setMeterData.meterSettings.rs_port=MeterSetting.mSArea2.input_rs_port.value;
             setMeterData.meterSettings.rs485_adress=MeterSetting.mSArea2.input_rs485_adress.value;
@@ -120,8 +123,8 @@ export class Chart_meterSettings{
             //команда изменения данных счетчика на сервере
             meterSettingsLoader.show();
             let setMeterResponse=await ServerDataExchange.setMeterSettings({
-                idPath:forChartPageData.idPath,
-                text:setMeterData.text,
+                id:forChartPageData.id,
+                name:setMeterData.text,
                 meterSettings:setMeterData.meterSettings
 
             })

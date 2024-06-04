@@ -22,6 +22,7 @@ export let ServerDataExchange=class{
     ];
     static NO_CHANGES='nc';
     static ERR_NAMEALREADYEXIST='err: name already exist in folder';
+    static #SERVER_API='http://172.17.1.36/api/';
 
     //получить данные по графику счетчика
     static async getChartData(idPath,timeRange){
@@ -53,7 +54,7 @@ export let ServerDataExchange=class{
          //обмен данными с сервером
          else{
             try{
-                let response=await fetch('http://172.17.1.36/api/tree',{
+                let response=await fetch(`${this.#SERVER_API}tree`,{
                     method: "GET"
                 })
                 result=await response.json();
@@ -75,9 +76,39 @@ export let ServerDataExchange=class{
     //добавить в струкутуру дерева данные элемента
     static async addItem (data){
         let response={done:false, err:false, errDescription:''};
+
         //симуляция обмена данными с сервером
         if(this.#dataExchangeSimulation[2]){
             response=await new ServDataExchangeSim().addItem(data);
+        }
+
+        //обмен данными с сервером
+        else{
+            let command=`${this.#SERVER_API}tree/`;
+
+            //определяем, что добавляем
+            if(data.meter){
+                command=command+`${data.id}/meters/create/${data.name}?`;
+                command=command+`ip=${data.meterSettings.ip}`;
+                command=command+`&port=${data.meterSettings.rs_type}`;
+                command=command+`&exchangeTimeType=${data.meterSettings.exchangeTimeType}`;
+                command=command+`&exchangeTimeValue=${data.meterSettings.exchangeTimeValue}`;
+            }else{
+                command=command+`create/${data.id}/${data.name}`
+            }
+
+            //команда серверу
+            try{
+                let response=await fetch(command,{
+                    method: "POST"
+                })
+                result=await response.json();
+            }
+            catch(err){
+                console.error('getTreeStructureData', 'sim=false', 'Ошибка запроса', err);
+                response.err=true;
+                response.errDescription=err.message;
+            }
         }
 
         //инфо по данным в консоле
@@ -89,16 +120,45 @@ export let ServerDataExchange=class{
     }
 
     //удалить из струкутуры дерева данные элемента
-    static async deleteItem(idPath){
+    static async deleteItem(data){
+        let mainResponse={done:true, err:false, errDescription:''};
         //симуляция обмена данными с сервером
         if(this.#dataExchangeSimulation[3]){
-            await new ServDataExchangeSim().deleteItem(idPath);
+            await new ServDataExchangeSim().deleteItem(data);
+        }
+
+        //обмен данными с сервером
+        else{
+            let command=`${this.#SERVER_API}tree/`;
+
+            //определяем, что удаляем
+            if(data.meter){
+                command=command+`meters/delete/${data.id}`;
+            }else{
+                command=command+`delete/${data.id}`
+            }
+
+            //команда серверу
+            try{
+                let response=await fetch(command,{
+                    method: "DELETE"
+                })
+                //result=await response;
+            }
+            catch(err){
+                console.error('deleteItem', 'sim=false', 'Ошибка запроса', err);
+                mainResponse.done=false;
+                mainResponse.err=true;
+                mainResponse.errDescription=err.message;
+            }
         }
 
         //инфо по данным в консоле
         if(this.#showInfo[3]){
-            console.log('deleteItem', `sim=${this.#dataExchangeSimulation[3]}`, idPath);
+            console.log('deleteItem', `sim=${this.#dataExchangeSimulation[3]}`, data, mainResponse);
         }
+
+        return mainResponse;
     }
 
     //переименовать папку или счетчик
@@ -148,5 +208,6 @@ export let ServerDataExchange=class{
         }
         return response;
     }
+
     
 }

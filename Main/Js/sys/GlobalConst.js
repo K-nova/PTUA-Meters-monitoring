@@ -34,7 +34,7 @@ export const trendSetpoints=[
 export const meterSetting={
     exchangeTimeType: "1000",
     exchangeTimeValue: '5',
-    ip:['10','0','0','0'],
+    ip:'10.0.0.0',
     rs485_adress: "1",
     rs_port: "0",
     rs_type: "0",

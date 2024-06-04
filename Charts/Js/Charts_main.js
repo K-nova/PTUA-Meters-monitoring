@@ -52,8 +52,10 @@ let addFolderPopUpLogic=function(content, popUp){
         //команда добавляения данных счетчика на сервер
         ChartColl.treeLoader.show();
         let addFolderResponse=await ServerDataExchange.addItem({
-            idPath:ChartColl.mouseFTreeMenuEventPath.idPath,
-            text:content.addFolderNameInput.value || content.addFolderNameInput.placeholder,
+            id:ChartColl.mouseFTreeMenuEventPath.id,
+            parentId:ChartColl.mouseFTreeMenuEventPath.parentId,
+            meter:false,
+            name:content.addFolderNameInput.value || content.addFolderNameInput.placeholder,
             type: 'folder'
         });
         ChartColl.treeLoader.hide();
@@ -105,16 +107,21 @@ MeterSettingsContent.mSArea1.input_meter_path.value=ChartColl.mouseFTreeMenuEven
 
 ChartColl.addMeterPopUp.calllButton.addEventListener("click", ()=>{
     MeterSettingsContent.mSArea1.input_meter_path.value=ChartColl.mouseFTreeMenuEventPath.textPath;
+    MeterSettingsContent.deleteNameErr();
 })
 
+let meterSettingApply_retutn;
 //функция применить
 async function meterSettingApply(){
     //формируем данные настройки счетчика
     let meterSettings={};
-    meterSettings.ip=[];
+
+    let meterSettingsIpArr=[];
     for(let i=0; i<4; i++){
-        meterSettings.ip[i]=MeterSettingsContent.mSArea2.input_ip[i].value;
+        meterSettingsIpArr[i]=MeterSettingsContent.mSArea2.input_ip[i].value;
     }
+    meterSettings.ip=meterSettingsIpArr.join('.');
+
     meterSettings.rs_type=MeterSettingsContent.mSArea2.select_rs_type.value;
     meterSettings.rs_port=MeterSettingsContent.mSArea2.input_rs_port.value;
     meterSettings.rs485_adress=MeterSettingsContent.mSArea2.input_rs485_adress.value;
@@ -149,8 +156,10 @@ async function meterSettingApply(){
     //команда добавляения данных счетчика на сервер
     
     let addMeterResponse=await ServerDataExchange.addItem({
-        idPath:ChartColl.mouseFTreeMenuEventPath.idPath,
-        text:MeterSettingsContent.mSArea1.input_meter_name.value ||
+        id:ChartColl.mouseFTreeMenuEventPath.id,
+        parentId:ChartColl.mouseFTreeMenuEventPath.parentId,
+        meter:true,
+        name:MeterSettingsContent.mSArea1.input_meter_name.value ||
         MeterSettingsContent.mSArea1.input_meter_name.placeholder,
         meterSettings:meterSettings
 
@@ -161,10 +170,11 @@ async function meterSettingApply(){
         ChartColl.initiateTree();
     }else{
         if(addMeterResponse.errDescription==ServerDataExchange.ERR_NAMEALREADYEXIST){
-            MeterSettingsContent.addNameErr('Такое имя уже существует в данной папке!');          
-
+            MeterSettingsContent.setNameErr('Такое имя уже существует в данной папке!');
         }
     }
+
+    meterSettingApply_retutn= addMeterResponse.err;
 }
 
 //кнопки ок/отмена/применить
@@ -172,8 +182,13 @@ MeterSettingsContent.okCancelAccept.accept.addEventListener('click',()=>{
     meterSettingApply();
 });
 MeterSettingsContent.okCancelAccept.ok.addEventListener('click',()=>{
-    meterSettingApply();
-    ChartColl.addMeterPopUp.close();
+    async function waitAfterClick(){
+        await meterSettingApply();
+        if(!meterSettingApply_retutn){ChartColl.addMeterPopUp.close();}
+    }
+
+    waitAfterClick();
+   
 });
 MeterSettingsContent.okCancelAccept.cancel.addEventListener('click',()=>{
     ChartColl.addMeterPopUp.close();

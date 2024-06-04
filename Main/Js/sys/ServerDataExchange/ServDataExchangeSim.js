@@ -140,13 +140,16 @@ export class ServDataExchangeSim{
                 //функция добавления стандартныйх настроек счетчика во все объекты
                 let addMeterSettingsF=function(items){
                     for(let item of items){
-                        if('children' in item){
-                            addMeterSettingsF(item.children);
-                        }else{
-                            if(!('meterSettings' in item) && (item.type!='folder')){
-                                item.meterSettings=meterSetting;
+                        if('folders' in item && item.folders.length>0){
+                            addMeterSettingsF(item.folders);
+                        }
+
+                        if('meters' in item){
+                            for(let meter of item.meters){
+                                if(!('meterSettings' in meter) ){meter.meterSettings=meterSetting;}
                             }
                         }
+                            
                     }
                 }
                 //делаем запрос из локальной сессии
@@ -154,10 +157,13 @@ export class ServDataExchangeSim{
                 //если данных в сессии нет
                 if(!(result instanceof Object)){
                     result= defSimTreeData;
-                    //добавляем стандартные настройки счетчика
-                    addMeterSettingsF(result);
+
+                    //добавляем стандартные настройки счетчика. только для сохранения в локальной памяти
+                    let resultWithMeterSettings=JSON.parse(JSON.stringify(result));
+                    addMeterSettingsF(resultWithMeterSettings);
+
                     //сохраняем данные в локальной сессии
-                    sessionStorage.setItem(locStorName(this.#TREE_DATA_SORAGE_NAME),JSON.stringify(result) );
+                    sessionStorage.setItem(locStorName(this.#TREE_DATA_SORAGE_NAME),JSON.stringify(resultWithMeterSettings) );
                 }
     
                 resolve(result);
@@ -169,13 +175,13 @@ export class ServDataExchangeSim{
     
 
     //получить настройки счетчика
-    #getMeterSettingsPure=(idPath)=>{
+    #getMeterSettingsPure=(id)=>{
         let result;
 
         //делаем запрос из локальной сессии
         let treeData=JSON.parse(sessionStorage.getItem(locStorName(this.#TREE_DATA_SORAGE_NAME)));
         //поиск объекта
-        let foundResult=this.#findItem(idPath,treeData);
+        let foundResult=this.#getItemOnServer(id,treeData, true);
         //поиск настроек в объекте
         if('meterSettings' in foundResult.item){
             result=foundResult.item.meterSettings;
@@ -189,14 +195,14 @@ export class ServDataExchangeSim{
 
     }
 
-    getMeterSettings=(idPath)=>{
+    getMeterSettings=(id)=>{
         return new Promise((resolve, reject)=>{
             let result;
 
             //имитируем задержку, необходимую для загрузки данных
             setTimeout(()=>{
 
-                result=this.#getMeterSettingsPure(idPath);
+                result=this.#getMeterSettingsPure(id);
 
                 resolve(result);
         
@@ -204,10 +210,8 @@ export class ServDataExchangeSim{
         }) 
     }
 
-    
-
     //получить данные по графику
-    getChartData=(idPath,timeRange)=>{
+    getChartData=(meterId,timeRange)=>{
         return new Promise((resolve, reject)=>{
             let result;
 
@@ -218,7 +222,7 @@ export class ServDataExchangeSim{
                 let endTime;
 
                 let currentTime=new Date()
-                let prevTimeStamp={idPath:idPath, timeStamp: new Date(0)};
+                let prevTimeStamp={meterId:meterId, timeStamp: new Date(0)};
                 let dataExchangePeriod=0;
                 let timeDiff=0;
                 let timeIntervalReached=false;
@@ -244,13 +248,13 @@ export class ServDataExchangeSim{
                 }
 
                 //------получаем данные по счетчику
-                let meterSettingsData=this.#getMeterSettingsPure(idPath);
+                let meterSettingsData=this.#getMeterSettingsPure(meterId);
 
                 //------предыдущая временная метка
                 //ищем или создаем временную метку предыдущих данных
                 let timeStampFound=false;
                 for(let simPrevExchangeTimeStamp of this.#simPrevExchangeTimeStamps){
-                    if(simPrevExchangeTimeStamp.idPath==idPath){
+                    if(simPrevExchangeTimeStamp.meterId==meterId){
                         prevTimeStamp=simPrevExchangeTimeStamp;
                         timeStampFound=true;
                     }
@@ -260,8 +264,6 @@ export class ServDataExchangeSim{
                     this.#simPrevExchangeTimeStamps.push(prevTimeStamp);
                 }
                 
-                
-            
                 //определяем прошло ли соответсвующее время
                 timeDiff=currentTime.getTime()-prevTimeStamp.timeStamp.getTime();
                 dataExchangePeriod=meterSettingsData.exchangeTimeValue*meterSettingsData.exchangeTimeType;
@@ -342,23 +344,24 @@ export class ServDataExchangeSim{
                 //делаем запрос из локальной сессии
                 let treeData=JSON.parse(sessionStorage.getItem(locStorName(this.#TREE_DATA_SORAGE_NAME)));
                 //поиск папки
-                let foundResult=this.#findItem(data.idPath,treeData);
+                let foundResult;
                 let foundItem;
-                if(foundResult.item!=undefined){
-                    if('children' in foundResult.item){
-                        foundItem=foundResult.item.children;
+                if(data.id!='/'){
+                    foundResult=this.#getItemOnServer(data.id,treeData, false);
+                    if(data.meter){
+                        foundItem=foundResult.item.meters;
                     }else{
-                        foundResult.item.children=[];
-                        foundItem=foundResult.item.children;
+                        foundItem=foundResult.item.folders;
                     }
                     
                 }else{
-                    foundItem=foundResult.targetFolder;
+                    foundItem=treeData;
                 }
+        
                 //проверяем ошибки такого же имени
                 let nameExist=false;
                 for(let item of foundItem){
-                    if(item.text==data.text){
+                    if(item.name==data.name){
                         nameExist=true;
                         response.err=true;
                         response.errDescription=this.#ERR_NAMEALREADYEXIST;
@@ -368,22 +371,22 @@ export class ServDataExchangeSim{
         
                 if(!nameExist){
                     //определение Id
-                    let idArr=[];
-                    for(let item of foundItem){
-                        idArr.push(Number(item.id));
-                    }
-        
-                    newItem.id=Math.max(...idArr)+1;
+                            
+                    newItem.id=this.#getFreeIdOnServer(treeData,data.meter);
                     newItem.id=newItem.id.toString();
         
                     //определение текста
-                    newItem.text=data.text;
+                    newItem.name=data.name;
         
-                    //определение типа
-                    newItem.type=data.type;
-        
+                    //добавление атрибутов папки
+                    if(!data.meter){
+                        newItem.folders=[];
+                        newItem.meters=[];
+                    }        
                     //добавляем данные настройки счетчика
-                    newItem.meterSettings=data.meterSettings;
+                    else{
+                        newItem.meterSettings=data.meterSettings;
+                    }
         
                     //интегрируем в данные дерева и сохраняем локальной сессии
                     foundItem.push(newItem);
@@ -404,7 +407,7 @@ export class ServDataExchangeSim{
     }
 
     //удалить из струкутуры дерева данные элемента
-    deleteItem=(idPath)=>{
+    deleteItem=(data)=>{
         return new Promise((resolve, reject)=>{
              //имитируем задержку, необходимую для загрузки данных
              setTimeout(()=>{
@@ -412,14 +415,28 @@ export class ServDataExchangeSim{
                 let treeData=JSON.parse(sessionStorage.getItem(locStorName(this.#TREE_DATA_SORAGE_NAME)));
 
                 //поиск элементов
-                let foundResult=this.#findItem(idPath,treeData);
+                let foundResult=this.#getItemOnServer(data.id,treeData, data.meter);
 
-                //поиск счетчика и его удаление
+                //
+                let targetFolder;
+                if(foundResult.targetFolder!=treeData){
+                    if(data.meter){
+                        targetFolder=foundResult.targetFolder.meters;
+                    }else{
+                        targetFolder=foundResult.targetFolder.folders;
+                    }
+                    
+                }else{
+                    targetFolder=foundResult.targetFolder;
+                }
+
+                //поиск элемента и его удаление
                 let i=0;
-                for(let folderItem of foundResult.targetFolder){
+
+                for(let folderItem of targetFolder){
                     if(folderItem.id==foundResult.item.id){
                         //удаляем
-                        foundResult.targetFolder.splice(i, 1)
+                        targetFolder.splice(i, 1)
                         //сохраняем локальной сессии
                         sessionStorage.setItem(locStorName(this.#TREE_DATA_SORAGE_NAME),JSON.stringify(treeData) );
                         break;
@@ -447,12 +464,25 @@ export class ServDataExchangeSim{
                 //делаем запрос из локальной сессии
                 let treeData=JSON.parse(sessionStorage.getItem(locStorName(this.#TREE_DATA_SORAGE_NAME)));
                 //поиск объекта
-                let foundResult=this.#findItem(data.idPath,treeData);
+                let foundResult=this.#getItemOnServer(data.id,treeData, data.meter);
+
+                //
+                let targetFolder;
+                if(foundResult.targetFolder!=treeData){
+                    if(data.meter){
+                        targetFolder=foundResult.targetFolder.meters;
+                    }else{
+                        targetFolder=foundResult.targetFolder.folders;
+                    }
+                    
+                }else{
+                    targetFolder=foundResult.targetFolder;
+                }
 
                 //проверяем ошибки такого же имени
                 let nameExist=false;
-                for(let item of foundResult.targetFolder){
-                    if(item.text==data.text  && item.id!=foundResult.item.id){
+                for(let item of targetFolder){
+                    if(item.name==data.name ){
                         nameExist=true;
                         response.err=true;
                         response.errDescription=this.#ERR_NAMEALREADYEXIST;
@@ -462,7 +492,7 @@ export class ServDataExchangeSim{
 
                 if(!nameExist){
                     //устанавливаем новое имя объекта
-                    foundResult.item.text=data.text;
+                    foundResult.item.name=data.name;
 
                     //записываем данные обратно в сессию
                     sessionStorage.setItem(locStorName(this.#TREE_DATA_SORAGE_NAME),JSON.stringify(treeData) );
@@ -488,12 +518,12 @@ export class ServDataExchangeSim{
                 //делаем запрос из локальной сессии
                 let treeData=JSON.parse(sessionStorage.getItem(locStorName(this.#TREE_DATA_SORAGE_NAME)));
                 //поиск объекта
-                let foundResult=this.#findItem(data.idPath,treeData);
+                let foundResult=this.#getItemOnServer(data.id,treeData,true);
 
                 //проверяем ошибки такого же имени
                 let nameExist=false;
-                for(let item of foundResult.targetFolder){
-                    if(item.text==data.text && item.id!=foundResult.item.id){
+                for(let item of foundResult.targetFolder.meters){
+                    if(item.name==data.name && item.id!=foundResult.item.id){
                         nameExist=true;
                         response.err=true;
                         response.errDescription=this.#ERR_NAMEALREADYEXIST;
@@ -503,7 +533,7 @@ export class ServDataExchangeSim{
 
                 if(!nameExist){
                     //изменение имени
-                    foundResult.item.text=data.text;
+                    foundResult.item.name=data.name;
                     //изменение настроек
                     foundResult.item.meterSettings=data.meterSettings;
                     //сохраняем локальной сессии
@@ -520,38 +550,102 @@ export class ServDataExchangeSim{
         
     }
 
-    //найти требуемый элемент
-    #findItem=function(idPath, treeData){
-        //обработка пути
-        let ids=idPath.split("/");
-        ids.shift();
+    //найти требуемый элемент на сервере
+    #getItemOnServer=function(id, treeData, meterTarget){
 
-        //предустановки поиска
-        let targetFolders=treeData;
-        let item;
-        let i=0;
+        let result;
 
-        //поиск
-        for(let id of ids){
-            i++;
-            for(let targetFolder of targetFolders){
-                if(targetFolder.id==id){
-                    if(i<ids.length){
-                        targetFolders=targetFolder.children; 
-                    }else{
-                        item=targetFolder; 
+
+        //функция поиск счетчиков
+        let findItem_Internal=(meterTarget=true, startFolder, isRoot=false)=>{
+            let result={itemFounded:false,item:undefined,targetFolder:undefined};
+            
+            //простой поиск счетчиков
+            if(meterTarget && 'meters' in startFolder && startFolder.meters.length>0){
+                for(let meter of startFolder.meters){
+                    if(meter.id==id){
+                        result.itemFounded=true;
+                        result.item=meter;
+                        result.targetFolder=startFolder;
+                        break;
                     }
-                    
                 }
             }
+
+            //простой поиск папок
+            if(!meterTarget){
+
+                let startFolderAndRoot;
+                if(isRoot){startFolderAndRoot=startFolder;}
+                else{startFolderAndRoot=startFolder.folders;}
+
+                for(let folder of startFolderAndRoot){
+                    if(folder.id==id){
+                        result.itemFounded=true;
+                        result.item=folder;
+                        result.targetFolder=startFolder;
+                        break;
+                    }
+                }
+            }
+
+            //поиск счетчиков по папкам
+            if(!result.itemFounded){
+                let foundItemResult;
+                let targetFolder;
+                let searchingActive=false;
+
+                //определяем поиск в корневой папке
+                if (isRoot){
+                    targetFolder=startFolder;
+                    searchingActive=true;
+                }
+                    //определяем поиск во вложенной папке
+                else{
+                    targetFolder=startFolder.folders;
+                    searchingActive=targetFolder.length>0;
+                }
+
+                if(searchingActive){
+                    //поиск
+                    for(let folder of targetFolder){
+                        foundItemResult=findItem_Internal(meterTarget,folder, false);
+
+                        if(foundItemResult.itemFounded){
+                            result.itemFounded=true;
+                            result.item=foundItemResult.item;
+                            result.targetFolder=foundItemResult.targetFolder;
+                            break;
+                        }
+                    }
+                }
+                
+            }
             
+            //
+            return result;
         }
-        let targetFolder=targetFolders;
+
+        result=findItem_Internal(meterTarget, treeData, true);        
 
         //возврат результатов
-        return {item:item, targetFolder:targetFolder};
+        return {item:result.item, targetFolder:result.targetFolder};
     }
 
+    //найти свободный id на сервере
+    #getFreeIdOnServer=(treeData, meterTarget)=>{
+        let result;
+        let getItemResult;
+        for(let id=1; id<=10000; id++){
+            getItemResult=this.#getItemOnServer(id,treeData,meterTarget);
+            if(getItemResult.item==undefined){
+                result=id;
+                break;
+            }
+        }
+
+        return result;
+    }
     
 
 }
