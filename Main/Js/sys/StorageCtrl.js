@@ -19,7 +19,7 @@ export class StorageCtrl{
         //обработка данных, если активен контроль версий
         if(parameters.versionCtrl){
             let resultWithVersion=JSON.parse(result.content);
-            if(!(('version' in resultWithVersion) && ('content' in resultWithVersion))){
+            if(resultWithVersion==null || !(('version' in resultWithVersion) && ('content' in resultWithVersion))){
                 result.content=resultWithVersion;
                 result.version=false;
                 result.versionIsActual=false;
