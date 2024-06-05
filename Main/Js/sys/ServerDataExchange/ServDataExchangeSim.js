@@ -9,6 +9,11 @@ export class ServDataExchangeSim{
     #NO_CHANGES=ServerDataExchange.NO_CHANGES;
     #ERR_NAMEALREADYEXIST=ServerDataExchange.ERR_NAMEALREADYEXIST;
     #TIME_DELAY=500;
+    #STORAGE_PARAMETERS={
+        isJSON:true,
+        versionCtrl: true,
+        version: '1'
+    }
 
     //структура симулированного обмена данными
     #simDataFromServer={
@@ -153,7 +158,9 @@ export class ServDataExchangeSim{
                     }
                 }
                 //делаем запрос из локальной сессии
-                result=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME);
+                let resultFromStorage=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME, this.#STORAGE_PARAMETERS);
+                if(resultFromStorage.versionIsActual){result=resultFromStorage.content;}
+
                 //если данных в сессии нет
                 if(!(result instanceof Object)){
                     result= defSimTreeData;
@@ -163,7 +170,7 @@ export class ServDataExchangeSim{
                     addMeterSettingsF(resultWithMeterSettings);
 
                     //сохраняем данные в локальной сессии
-                    StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, resultWithMeterSettings);
+                    StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, resultWithMeterSettings, this.#STORAGE_PARAMETERS);
                 }
     
                 resolve(result);
@@ -179,7 +186,8 @@ export class ServDataExchangeSim{
         let result;
 
         //делаем запрос из локальной сессии
-        let treeData=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME);
+        let resultFromStorage=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME, this.#STORAGE_PARAMETERS);
+        let treeData=resultFromStorage.content;
         //поиск объекта
         let foundResult=this.#getItemOnServer(id,treeData, true);
         //поиск настроек в объекте
@@ -342,7 +350,8 @@ export class ServDataExchangeSim{
                 let newItem={};
     
                 //делаем запрос из локальной сессии
-                let treeData=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME);
+                let resultFromStorage=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME, this.#STORAGE_PARAMETERS);
+                let treeData=resultFromStorage.content;
                 //поиск папки
                 let foundResult;
                 let foundItem;
@@ -390,7 +399,7 @@ export class ServDataExchangeSim{
         
                     //интегрируем в данные дерева и сохраняем локальной сессии
                     foundItem.push(newItem);
-                    StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, treeData);
+                    StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, treeData, this.#STORAGE_PARAMETERS);
                     
                     //статус выполнения 
                     response.done=true
@@ -412,8 +421,8 @@ export class ServDataExchangeSim{
              //имитируем задержку, необходимую для загрузки данных
              setTimeout(()=>{
                 //делаем запрос из локальной сессии
-                let treeData=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME);
-
+                let resultFromStorage=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME, this.#STORAGE_PARAMETERS);
+                let treeData=resultFromStorage.content;
                 //поиск элементов
                 let foundResult=this.#getItemOnServer(data.id,treeData, data.meter);
 
@@ -438,7 +447,7 @@ export class ServDataExchangeSim{
                         //удаляем
                         targetFolder.splice(i, 1)
                         //сохраняем локальной сессии
-                        StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, treeData);
+                        StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, treeData, this.#STORAGE_PARAMETERS);
                         break;
                         
                     }
@@ -462,7 +471,8 @@ export class ServDataExchangeSim{
                 let response={done:false, err:false, errDescription:''};
         
                 //делаем запрос из локальной сессии
-                let treeData=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME);
+                let resultFromStorage=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME, this.#STORAGE_PARAMETERS);
+                let treeData=resultFromStorage.content;
                 //поиск объекта
                 let foundResult=this.#getItemOnServer(data.id,treeData, data.meter);
 
@@ -495,7 +505,7 @@ export class ServDataExchangeSim{
                     foundResult.item.name=data.name;
 
                     //записываем данные обратно в сессию
-                    StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, treeData);
+                    StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, treeData, this.#STORAGE_PARAMETERS);
                 
                     //статус выполнения 
                     response.done=true;
@@ -516,7 +526,8 @@ export class ServDataExchangeSim{
                 let response={done:false, err:false, errDescription:''};
 
                 //делаем запрос из локальной сессии
-                let treeData=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME);
+                let resultFromStorage=StorageCtrl.getItem(this.#TREE_DATA_SORAGE_NAME, this.#STORAGE_PARAMETERS);
+                let treeData=resultFromStorage.content;
                 //поиск объекта
                 let foundResult=this.#getItemOnServer(data.id,treeData,true);
 
@@ -537,7 +548,7 @@ export class ServDataExchangeSim{
                     //изменение настроек
                     foundResult.item.meterSettings=data.meterSettings;
                     //сохраняем локальной сессии
-                        StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, treeData);
+                        StorageCtrl.setItem(this.#TREE_DATA_SORAGE_NAME, treeData, this.#STORAGE_PARAMETERS);
                     //статус выполнения 
                     response.done=true;
                 }

@@ -4,7 +4,7 @@ let i=0;
 let slideshowItems=document.querySelectorAll('.slideshow-item');
 slideshowItems[i].classList.add('active');
 
-let passedSteps=StorageCtrl.getItem('slideShow_passedSteps',false);
+let passedSteps=StorageCtrl.getItem('slideShow_passedSteps',{isJSON:false});
 if(passedSteps==undefined){passedSteps=false;}
 
 //кнопка далее
@@ -17,7 +17,7 @@ let slideshowButtonELF=()=>{
         slideshowItems[i].classList.add('active');
         slideshowButtons[i].addEventListener('click',()=>{slideshowButtonELF()});
     }else{
-        StorageCtrl.setItem('slideShow_passedSteps', true, false);
+        StorageCtrl.setItem('slideShow_passedSteps', true, {isJSON:false});
 
         let Main=window.parent.document.querySelector('#Main');
         Main.data='Charts/Charts-main.html';

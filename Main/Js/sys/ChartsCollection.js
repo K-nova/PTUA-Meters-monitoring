@@ -133,7 +133,7 @@ export class ChartsCollection{
         //удалить
         this.mouseMTreeMenuContent[1].addEventListener('click', ()=>{
             if(confirm('удалить')){
-                async function deleteItem(){
+                let deleteItem=async ()=>{
                     //запрос серверу на удаление данных
                     let meterDeleteResponse=await ServerDataExchange.deleteItem({
                         id:this.mouseMTreeMenuEventPath.id,
@@ -144,7 +144,7 @@ export class ChartsCollection{
                     if(meterDeleteResponse.done){this.initiateTree();}
                 }
                 
-                deleteItem.call(this);
+                deleteItem();
 
             }
                  

@@ -20,7 +20,7 @@ export let TrainingMessages=class{
         let closedMem=true;
 
         //--создаем первое тренирочные сообщения
-        let optionNum=StorageCtrl.getItem(this.#currMsgMem+id, false);
+        let optionNum=StorageCtrl.getItem(this.#currMsgMem+id, {isJSON:false});
         if(optionNum!=undefined && optionNum>=0){
             this.optionsNum=optionNum;
         }
@@ -70,7 +70,7 @@ export let TrainingMessages=class{
                     }
     
                     //записываем в локальную сессию уже пройденные сообщения
-                    StorageCtrl.setItem(this.#currMsgMem+id, this.optionsNum,false);
+                    StorageCtrl.setItem(this.#currMsgMem+id, this.optionsNum,{isJSON:false});
                     
     
                 }
